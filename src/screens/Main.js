@@ -13,6 +13,7 @@ import Detail from './Detail'
 import Trending from './Trending'
 import Menu from './Menu'
 import Profile from './Profile'
+import MyArticle from './MyArticle'
 import AddNews from './AddNews'
 
 const HomeStack = () => {
@@ -35,6 +36,10 @@ const HomeStack = () => {
 const EditStack = () => {
   return(
     <Stack.Navigator>
+      <Stack.Screen 
+        options={{headerShown: false}}
+        name="MyArticle"
+        component={MyArticle} />
       <Stack.Screen 
         options={{headerShown: false}}
         name="AddNews"

@@ -52,7 +52,6 @@ export default class AddNews extends Component {
             {this.state.picture !== '' && (
               <Image source={{uri: this.state.picture}} style={{width: 100, height: 100}}/>
             )}
-            {/* <Image source={{uri: picture.uri}} style={{width: 100, height: 100}}/> */}
             <TouchableOpacity style={style.choosePhoto} onPress={this.handleChoosePhoto}>
               <Text>Choose photo</Text>
             </TouchableOpacity>
