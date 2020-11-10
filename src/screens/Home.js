@@ -15,12 +15,15 @@ export default class Home extends Component {
   goToMenu = () => {
     this.props.navigation.navigate('Menu');
   }
+  goToProfile = () => {
+    this.props.navigation.navigate('Profile');
+  }
   render() {
     return (
       <View>
         <Header
           backgroundColor='black'
-          centerComponent={<Image style={style.logoimage} source={logo} />}
+          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
           rightComponent={
             <TouchableOpacity>
               <Icon name="search" color='white' size={20} />
@@ -83,7 +86,7 @@ export default class Home extends Component {
               <View style={style.rightSide}>
                 <View style={style.upWrap}>
                   <Text style={style.category}>Category</Text>
-                  <TouchableOpacity style={style.titleWrap}>
+                  <TouchableOpacity style={style.titleWrap} onPress={this.goToProfile}>
                     <Text style={style.titleNews}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak</Text>
                   </TouchableOpacity>
                 </View>
@@ -138,9 +141,13 @@ const style = StyleSheet.create({
   wrapper: {
     marginBottom: 10
   },
+  imageWrapper: {
+    width: 160,
+    height: 18
+  },
   logoimage: {
-    width: '75%',
-    height: 28
+    width: '90%',
+    height: '100%'
   },
   sorotan: {
     borderBottomWidth: 3,

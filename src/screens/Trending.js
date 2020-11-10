@@ -10,7 +10,7 @@ export default class Trending extends Component {
       <View>
         <Header
           backgroundColor='black'
-          centerComponent={<Image style={style.logoimage} source={logo} />}
+          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
           rightComponent={
             <TouchableOpacity>
               <Icon name="search" color='white' size={20} />
@@ -80,9 +80,13 @@ const style = StyleSheet.create({
   wrapper: {
     marginBottom: 10
   },
+  imageWrapper: {
+    width: 160,
+    height: 18
+  },
   logoimage: {
-    width: '75%',
-    height: 28
+    width: '90%',
+    height: '100%'
   },
   sorotan: {
     borderBottomWidth: 3,

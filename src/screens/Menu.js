@@ -65,7 +65,7 @@ export default class Menu extends Component {
       <ScrollView>
         <Header
           backgroundColor='black'
-          centerComponent={<Image style={style.logoimage} source={logo} />}
+          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
           rightComponent={
             <TouchableOpacity>
               <Icon name="search" color='white' size={20} />
@@ -89,9 +89,13 @@ export default class Menu extends Component {
 }
 
 const style = StyleSheet.create({
+  imageWrapper: {
+    width: 160,
+    height: 18
+  },
   logoimage: {
-    width: '75%',
-    height: 28
+    width: '90%',
+    height: '100%'
   },
   title: {
     fontSize: 15
