@@ -5,6 +5,8 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {TouchableOpacity} from 'react-native';
 
+import {connect} from 'react-redux';
+
 const Stack = createStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
@@ -15,6 +17,7 @@ import Menu from './Menu'
 import Profile from './Profile'
 import MyArticle from './MyArticle'
 import AddNews from './AddNews'
+import Login from './Login'
 
 const HomeStack = () => {
   return(
@@ -44,23 +47,6 @@ const EditStack = () => {
         options={{headerShown: false}}
         name="AddNews"
         component={AddNews} />
-    </Stack.Navigator>
-  )
-}
-
-const Trendingstack = () => {
-  return(
-    <Stack.Navigator>
-      <Stack.Screen
-        options={{headerShown: false}}
-        name="Trending"
-        component={Trending}
-      />
-      <Stack.Screen
-        // options=
-        name="Detail"
-        component={Detail}
-      />
     </Stack.Navigator>
   )
 }
@@ -121,58 +107,81 @@ const ProfileStack = () => {
   )
 }
 
-export default class Main extends Component {
+class Main extends Component {
   render() {
+    console.log(this.props)
     return (
       <NavigationContainer>
-        <BottomTabs.Navigator>
-          <BottomTabs.Screen
-            options={{
-              tabBarIcon: ({size, color, focused}) => (
-                <Icon name="home" size={20} color={color} />
-              ),
-            }}
-            name="Home"
-            component={HomeStack}
-          />
-          <BottomTabs.Screen
-            options={{
-              tabBarIcon: ({size, color, focused}) => (
-                <Icon name="edit" size={20} color={color} />
-              ),
-            }}
-            name="Write"
-            component={EditStack}
-          />
-          <BottomTabs.Screen
-            options={{
-              tabBarIcon: ({size, color, focused}) => (
-                <Icon name="folder" size={25} color="#900" />
-              ),
-            }}
-            name="Menu"
-            component={MenuStack}
-          />
-          <BottomTabs.Screen
-            options={{
-              tabBarIcon: ({size, color, focused}) => (
-                <Icon name="bookmark" size={20} color={color} />
-              ),
-            }}
-            name="Bookmark"
-            component={BookmarkStack}
-          />
-          <BottomTabs.Screen
-            options={{
-              tabBarIcon: ({size, color, focused}) => (
-                <Icon name="user" size={20} color={color} />
-              ),
-            }}
-            name="Profile"
-            component={ProfileStack}
-          />
-        </BottomTabs.Navigator>
+        {this.props.auth.isLogin ? (
+          <BottomTabs.Navigator>
+            <BottomTabs.Screen
+              options={{
+                tabBarIcon: ({size, color, focused}) => (
+                  <Icon name="home" size={20} color={color} />
+                ),
+              }}
+              name="Home"
+              component={HomeStack}
+            />
+            <BottomTabs.Screen
+              options={{
+                tabBarIcon: ({size, color, focused}) => (
+                  <Icon name="edit" size={20} color={color} />
+                ),
+              }}
+              name="Write"
+              component={EditStack}
+            />
+            <BottomTabs.Screen
+              options={{
+                tabBarIcon: ({size, color, focused}) => (
+                  <Icon name="folder" size={25} color="#900" />
+                ),
+              }}
+              name="Menu"
+              component={MenuStack}
+            />
+            <BottomTabs.Screen
+              options={{
+                tabBarIcon: ({size, color, focused}) => (
+                  <Icon name="bookmark" size={20} color={color} />
+                ),
+              }}
+              name="Bookmark"
+              component={BookmarkStack}
+            />
+            <BottomTabs.Screen
+              options={{
+                tabBarIcon: ({size, color, focused}) => (
+                  <Icon name="user" size={20} color={color} />
+                ),
+              }}
+              name="Profile"
+              component={ProfileStack}
+            />
+          </BottomTabs.Navigator>
+        ) : (
+          <Stack.Navigator>
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="Login"
+              component={Login}
+            />
+            {/* <Stack.Screen
+              // options=
+              name="Detail"
+              component={Detail}
+            /> */}
+          </Stack.Navigator>
+        )}
+        
       </NavigationContainer>
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps)(Main);

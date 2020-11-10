@@ -2,9 +2,19 @@ import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Header } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {connect} from 'react-redux';
 import logo from '../assets/logokompas.png'
 
-export default class MyArticle extends Component {
+import store from '../redux/store';
+import newsAction from '../redux/actions/news';
+
+class MyArticle extends Component {
+  state = {
+    
+  }
+  componentDidMount() {
+    store.dispatch(newsAction.getNews());
+  }
   addNews = () => {
     this.props.navigation.navigate('AddNews')
   }
@@ -50,6 +60,12 @@ export default class MyArticle extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  news: state.news,
+});
+
+export default connect(mapStateToProps)(MyArticle);
 
 const style = StyleSheet.create({
   imageWrapper: {
@@ -124,9 +140,10 @@ const style = StyleSheet.create({
     borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
+    alignContent: 'center',
     marginRight: 10
   },
   editText: {
-    fontSize: 11
+    fontSize: 10
   },
 })

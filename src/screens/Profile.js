@@ -1,13 +1,35 @@
 import React, { Component } from 'react'
 import { View, Modal, Text, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, TextInput } from 'react-native'
 import { Header, Button } from 'react-native-elements'
-import { Form, Item, Label } from 'native-base'
+import { Form, Spinner, Label } from 'native-base'
+import {connect} from 'react-redux'
 
-export default class Profile extends Component {
+import profile from '../redux/actions/profile'
+
+class Profile extends Component {
   state = {
     modalProfile: false,
     modalPassword: false,
-    modalImage: false
+    modalImage: false,
+    name: '',
+    email: '',
+    birth: ''
+  }
+  componentDidMount() {
+    this.props.getProfile(this.props.auth.token)
+  }
+  componentDidUpdate() {
+    console.log(Object.keys(this.props.profile.data).length>0)
+    if(Object.keys(this.props.profile.data).length>0){
+      const { data } = this.props.profile
+      if(this.state.name==''){
+        this.setState({
+          name: data.name,
+          email: data.email,
+          birth: data.birth
+        })
+      }
+    }
   }
   changeImage = () => {
     this.setState({modalImage: true})
@@ -18,52 +40,66 @@ export default class Profile extends Component {
   changePassword = () => {
     this.setState({modalPassword: true})
   }
+  saveChangePersonalInfo = () => {
+    const data = {
+      name: this.state.name,
+      email: this.state.email,
+      birth: this.state.birth
+    }
+    this.props.changeProfile(this.props.auth.token, data)
+    this.setState({modalProfile: false})
+  }
   render() {
+    console.log(this.state)
+    const { name, email, birth } = this.state
     return (
       <View >
         <Header
           backgroundColor='black'
           centerComponent={{text:"Settings", style: { color:'#fff' } }}          
         />
-        <View style={style.parent}>
-          <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
-            <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
-          </TouchableOpacity>
-          <View style={style.setting0}>
-            <Text style={style.textSetting}>Personal information</Text>
-            <TouchableOpacity onPress={this.changePersonalInfo}><Text style={style.textGrey} >Change</Text></TouchableOpacity>
+        {this.state.name == undefined && <Spinner />}
+        {this.state.name !== undefined && (
+          <View style={style.parent}>
+            <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
+              <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+            </TouchableOpacity>
+            <View style={style.setting0}>
+              <Text style={style.textSetting}>Personal information</Text>
+              <TouchableOpacity onPress={this.changePersonalInfo}><Text style={style.textGrey} >Change</Text></TouchableOpacity>
+            </View>
+            <View>
+              <View style={style.labelWrapper}>
+                <Text style={style.label}>Full name</Text>
+                <Text style={style.labelName}>{name}</Text>
+              </View>
+              <View style={style.labelWrapper}>
+                <Text style={style.label}>Email</Text>
+                <Text style={style.labelName}>{email}</Text>
+              </View>
+              <View style={style.labelWrapper}>
+                <Text style={style.label}>Date of birth</Text>
+                <Text style={style.labelName}>{birth}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={style.setting}>
+              <Text style={style.textSetting} onPress={this.changePassword}>Setting</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={style.setting}>
+              <Text style={style.textSetting}>Logout</Text>
+            </TouchableOpacity>
           </View>
-          <View>
-            <View style={style.labelWrapper}>
-              <Text style={style.label}>Full name</Text>
-              <Text style={style.labelName}>Matilda Brown</Text>
-            </View>
-            <View style={style.labelWrapper}>
-              <Text style={style.label}>Email</Text>
-              <Text style={style.labelName}>matilda@mail.com</Text>
-            </View>
-            <View style={style.labelWrapper}>
-              <Text style={style.label}>Date of birth</Text>
-              <Text style={style.labelName}>1990-01-01</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={style.setting}>
-            <Text style={style.textSetting} onPress={this.changePassword}>Setting</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={style.setting}>
-            <Text style={style.textSetting}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+        )}
 
         <Modal transparent visible={this.state.modalProfile}>
           <KeyboardAvoidingView style={style.modalView}>
             <Form style={style.form}>
               <Label style={style.label}>Full name</Label>
-              <TextInput style={style.input} />
+              <TextInput style={style.input} value={name} onChangeText={(text) => this.setState({name: text})} />
               <Label style={style.label}>Email</Label>
-              <TextInput style={style.input} />
+              <TextInput style={style.input} value={email} onChangeText={(text) => this.setState({email: text})} />
               <Label style={style.label}>Date of birth</Label>
-              <TextInput style={style.input} />
+              <TextInput style={style.input} value={birth} onChangeText={(text) => this.setState({birth: text})} />
             </Form>
             <View style={style.buttonWrapper}>
               <Button
@@ -78,7 +114,7 @@ export default class Profile extends Component {
                 type="outline"
                 buttonStyle={style.buttonOutline}
                 titleStyle={style.buttonTittle}
-                onPress={()=>this.setState({modalProfile: false})}
+                onPress={this.saveChangePersonalInfo}
               />
             </View>
           </KeyboardAvoidingView>
@@ -114,6 +150,18 @@ export default class Profile extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  profile: state.profile,
+});
+
+const mapDispatchToProps = {
+  getProfile: profile.getProfile,
+  changeProfile: profile.changeProfile,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const style = StyleSheet.create({
   avaWrapper: {
