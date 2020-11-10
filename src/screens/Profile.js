@@ -3,6 +3,7 @@ import { View, Modal, Text, Image, StyleSheet, TouchableOpacity, KeyboardAvoidin
 import { Header, Button } from 'react-native-elements'
 import { Form, Spinner, Label } from 'native-base'
 import {connect} from 'react-redux'
+import ImagePicker from 'react-native-image-picker'
 
 import profile from '../redux/actions/profile'
 
@@ -13,7 +14,8 @@ class Profile extends Component {
     modalImage: false,
     name: '',
     email: '',
-    birth: ''
+    birth: '',
+    picture: ''
   }
   componentDidMount() {
     this.props.getProfile(this.props.auth.token)
@@ -34,6 +36,15 @@ class Profile extends Component {
   changeImage = () => {
     this.setState({modalImage: true})
   }
+  changeImageOnly = () => {
+    const options = {};
+    ImagePicker.launchImageLibrary(options, (response) => {
+      console.log(response)
+      if (response.uri) {
+        this.setState({picture: response, modalOpen: false});
+      }
+    })
+  }
   changePersonalInfo = () => {
     this.setState({modalProfile: true})
   }
@@ -44,7 +55,8 @@ class Profile extends Component {
     const data = {
       name: this.state.name,
       email: this.state.email,
-      birth: this.state.birth
+      birth: this.state.birth,
+      picture: this.state.picture
     }
     this.props.changeProfile(this.props.auth.token, data)
     this.setState({modalProfile: false})
@@ -62,7 +74,11 @@ class Profile extends Component {
         {this.state.name !== undefined && (
           <View style={style.parent}>
             <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
+            {this.state.picture == '' ? (
               <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+            ) : (
+              <Image style={style.ava} source={this.state.picture}/>
+            )}
             </TouchableOpacity>
             <View style={style.setting0}>
               <Text style={style.textSetting}>Personal information</Text>
@@ -90,6 +106,29 @@ class Profile extends Component {
             </TouchableOpacity>
           </View>
         )}
+
+        <Modal transparent visible={this.state.modalImage}>
+          <View style={style.modalView1}>
+            <View style={style.avaWrapper}>
+              {this.state.picture == '' ? (
+                <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+              ) : (
+                <Image style={style.ava} source={{uri: this.state.picture.uri}}/>
+              )}
+            </View>
+            <View style={style.buttonWrapper2}>
+              <TouchableOpacity style={style.choosePhoto} onPress={this.changeImageOnly} >
+                <Text>Choose</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={style.choosePhoto} onPress={()=>this.setState({modalImage: false})}>
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={style.choosePhoto1} onPress={this.saveChangePersonalInfo} >
+              <Text>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
         <Modal transparent visible={this.state.modalProfile}>
           <KeyboardAvoidingView style={style.modalView}>
@@ -194,6 +233,28 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 5
   },
+  choosePhoto: {
+    borderWidth: 1,
+    borderRadius: 25,
+    borderColor: 'black',
+    width: '45%',
+    marginVertical: 10,
+    height: 40,
+    alignItems: 'center',
+    alignContent: 'center',
+    justifyContent: 'center'
+  },
+  choosePhoto1: {
+    borderWidth: 1,
+    borderRadius: 25,
+    borderColor: 'black',
+    width: '90%',
+    marginVertical: 10,
+    height: 40,
+    alignItems: 'center',
+    alignContent: 'center',
+    justifyContent: 'center'
+  },
   label: {
     fontSize: 9,
     color: 'grey'
@@ -225,6 +286,16 @@ const style = StyleSheet.create({
     paddingRight: '3%',
     backgroundColor: '#dcdcdc'
   },
+  modalView1: {
+    marginTop: 50,
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    backgroundColor: '#dcdcdc'
+  },
   form: {
     marginLeft: 0
   },
@@ -241,6 +312,13 @@ const style = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     width: '70%',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    marginTop: 10
+  },
+  buttonWrapper2: {
+    flexDirection: 'row',
+    width: '90%',
     justifyContent: 'space-between',
     alignSelf: 'center',
     marginTop: 10

@@ -17,6 +17,7 @@ import Menu from './Menu'
 import Profile from './Profile'
 import MyArticle from './MyArticle'
 import AddNews from './AddNews'
+import EditNews from './EditNews'
 import Login from './Login'
 
 const HomeStack = () => {
@@ -47,6 +48,10 @@ const EditStack = () => {
         options={{headerShown: false}}
         name="AddNews"
         component={AddNews} />
+        <Stack.Screen 
+        options={{headerShown: false}}
+        name="EditNews"
+        component={EditNews} />
     </Stack.Navigator>
   )
 }

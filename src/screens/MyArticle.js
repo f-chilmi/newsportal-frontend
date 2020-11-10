@@ -18,6 +18,9 @@ class MyArticle extends Component {
   addNews = () => {
     this.props.navigation.navigate('AddNews')
   }
+  editNews = () => {
+    this.props.navigation.navigate('EditNews')
+  }
   render() {
     return (
       <View>
@@ -47,7 +50,7 @@ class MyArticle extends Component {
                   </View>
                   <View style={style.downWrap}>
                     <Text style={style.timeText}>1 jam yang lalu</Text>
-                    <TouchableOpacity style={style.editButton}>
+                    <TouchableOpacity style={style.editButton} onPress={this.editNews}>
                       <Text style={style.editText}>Edit</Text>
                     </TouchableOpacity>
                   </View>
