@@ -1,60 +1,37 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import {Spinner} from 'native-base'
-import {Header} from 'react-native-elements'
-import Icon from 'react-native-vector-icons/FontAwesome'
-import {connect} from 'react-redux'
-import logo from '../assets/logokompas.png'
+import { SearchBar as SearchComponent } from 'react-native-elements'
+import { Spinner } from 'native-base'
 import {APP_URL} from '@env'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
-import HeaderComponent from '../components/HeaderComponent'
+import {connect} from 'react-redux'
+import news from '../redux/actions/news'
 
-import store from '../redux/store';
-import newsAction from '../redux/actions/news';
-
-class Home extends Component {
-  componentDidMount() {
-    if(!(this.props.news.configHome=='/public?search=')){
-      store.dispatch(newsAction.getNews())
-    }
+class SearchBar extends Component {
+  state = {
+    search: ''
   }
-  // componentDidUpdate() {
-  //   if(!(this.props.news.configHome=='/public?search=')){
-  //     store.dispatch(newsAction.getNews())
-  //   }
-  // }
+  updateSearch = (text) => {
+    this.setState({search: text})
+    this.props.getNews(this.state.search)
+  }
   goToDetail = (id) => {
     this.props.navigation.navigate('Detail', {id});
   }
-  goToTrending = () => {
-    this.props.navigation.navigate('Trending');
-  }
-  goToMenu = () => {
-    this.props.navigation.navigate('Menu');
-  }
-  goToProfile = () => {
-    this.props.navigation.navigate('Profile');
-  }
-  search = () => {
-    this.props.navigation.navigate('SearchBar')
-  }
   render() {
+    console.log(this.state.search)
     const {data} = this.props.news
-    console.log(this.props)
-    console.log(!(this.props.news.configHome=='/public?search='))
     return (
-      <View>
-        <Header
-          backgroundColor='black'
-          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
-          rightComponent={
-            <TouchableOpacity onPress={this.search}>
-              <Icon name="search" color='white' size={20} />
-            </TouchableOpacity>
-          }
+      <View style={{flex: 1, paddingTop: 20}}>
+        <SearchComponent
+          round
+          placeholder="Search"
+          onChangeText={(text)=>this.updateSearch(text)}
+          value={this.state.search}
         />
         {Object.keys(data).length==0 && <Spinner />}
-        {Object.keys(data).length>0 && (
+        {this.state.search!=='' && Object.keys(data).length>0 && (
           <ScrollView style={style.parent}>
             <View style={style.wrapper}>
               <Text style={style.sorotan}>SOROTAN</Text>
@@ -64,7 +41,7 @@ class Home extends Component {
                   <View style={style.rightSide}>
                     <View style={style.upWrap}>
                       <Text style={style.category}>{item.Category.category}</Text>
-                      <TouchableOpacity style={style.titleWrap} onPress={()=>this.goToDetail(item.id)}>
+                      <TouchableOpacity style={style.titleWrap} onPress={this.search}>
                         <Text style={style.titleNews}>{item.title}</Text>
                       </TouchableOpacity>
                     </View>
@@ -80,17 +57,18 @@ class Home extends Component {
             <View style={{height: 90, backgroundColor: 'transparent'}}></View>     
           </ScrollView>
         )}
-        
       </View>
     )
   }
 }
 
-const mapStateToProps = (state) => ({
-  news: state.news,
-})
+const mapStateToProps = (state) => ({news: state.news});
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = {
+  getNews: news.getNews,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
 
 const style = StyleSheet.create({
   parent: {

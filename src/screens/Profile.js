@@ -4,6 +4,7 @@ import { Header, Button } from 'react-native-elements'
 import { Form, Spinner, Label } from 'native-base'
 import {connect} from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
+import {APP_URL} from '@env'
 
 import profile from '../redux/actions/profile'
 
@@ -21,7 +22,6 @@ class Profile extends Component {
     this.props.getProfile(this.props.auth.token)
   }
   componentDidUpdate() {
-    console.log(Object.keys(this.props.profile.data).length>0)
     if(Object.keys(this.props.profile.data).length>0){
       const { data } = this.props.profile
       if(this.state.name==''){
@@ -45,13 +45,14 @@ class Profile extends Component {
       }
     })
   }
-  changePersonalInfo = () => {
-    this.setState({modalProfile: true})
-  }
+  // changePersonalInfo = () => {
+  //   this.setState({modalProfile: true})
+  // }
   changePassword = () => {
     this.setState({modalPassword: true})
   }
   saveChangePersonalInfo = () => {
+    this.setState({modalProfile: false})
     const data = {
       name: this.state.name,
       email: this.state.email,
@@ -59,10 +60,8 @@ class Profile extends Component {
       picture: this.state.picture
     }
     this.props.changeProfile(this.props.auth.token, data)
-    this.setState({modalProfile: false})
   }
   render() {
-    console.log(this.state)
     const { name, email, birth } = this.state
     return (
       <View >
@@ -75,14 +74,20 @@ class Profile extends Component {
           <View style={style.parent}>
             <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
             {this.state.picture == '' ? (
-              <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+              (this.props.profile.data.image == '' ? (
+                <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+              ) : (
+                <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
+              ))
             ) : (
               <Image style={style.ava} source={this.state.picture}/>
             )}
             </TouchableOpacity>
             <View style={style.setting0}>
               <Text style={style.textSetting}>Personal information</Text>
-              <TouchableOpacity onPress={this.changePersonalInfo}><Text style={style.textGrey} >Change</Text></TouchableOpacity>
+              <TouchableOpacity onPress={()=>this.setState({modalProfile: true})}>
+                <Text style={style.textGrey} >Change</Text>
+              </TouchableOpacity>
             </View>
             <View>
               <View style={style.labelWrapper}>
@@ -111,9 +116,13 @@ class Profile extends Component {
           <View style={style.modalView1}>
             <View style={style.avaWrapper}>
               {this.state.picture == '' ? (
-                <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+                (this.props.profile.data.image == '' ? (
+                  <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+                ) : (
+                  <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
+                ))
               ) : (
-                <Image style={style.ava} source={{uri: this.state.picture.uri}}/>
+                <Image style={style.ava} source={this.state.picture}/>
               )}
             </View>
             <View style={style.buttonWrapper2}>
@@ -124,7 +133,7 @@ class Profile extends Component {
                 <Text>Cancel</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={style.choosePhoto1} onPress={this.saveChangePersonalInfo} >
+            <TouchableOpacity style={style.choosePhoto1} onPress={(this.saveChangePersonalInfo)} >
               <Text>Save</Text>
             </TouchableOpacity>
           </View>

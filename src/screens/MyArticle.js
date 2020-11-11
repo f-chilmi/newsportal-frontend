@@ -1,63 +1,60 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { Header } from 'react-native-elements'
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {connect} from 'react-redux';
-import logo from '../assets/logokompas.png'
+import {Spinner} from 'native-base'
+import {connect} from 'react-redux'
+import {APP_URL} from '@env'
 
-import store from '../redux/store';
-import newsAction from '../redux/actions/news';
+import HeaderComponent from '../components/HeaderComponent'
+import profile from '../redux/actions/profile'
 
 class MyArticle extends Component {
   state = {
     
   }
   componentDidMount() {
-    store.dispatch(newsAction.getNews());
+    this.props.myArticle(this.props.auth.token)
   }
   addNews = () => {
     this.props.navigation.navigate('AddNews')
   }
-  editNews = () => {
-    this.props.navigation.navigate('EditNews')
+  editNews = (id) => {
+    this.props.navigation.navigate('EditNews', {id})
   }
   render() {
+    console.log(this.props)
+    const { myArticle } = this.props.profile
     return (
       <View>
-        <Header
-          backgroundColor='black'
-          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
-          rightComponent={
-            <TouchableOpacity>
-              <Icon name="search" color='white' size={20} />
-            </TouchableOpacity>
-          }
-        />
+        <HeaderComponent />
         <View style={style.parent}>
           <TouchableOpacity style={style.buttonAdd} onPress={this.addNews}>
             <Text style={style.textAdd}>Add new article</Text>
           </TouchableOpacity>
           <ScrollView>
-            <View style={style.wrapper}>
-              <View style={style.card}>
-                <Image style={style.cardImage} source={require('../assets/5fa3e598894a4.jpg')} />
-                <View style={style.rightSide}>
-                  <View style={style.upWrap}>
-                    <Text style={style.category}>Category</Text>
-                    <TouchableOpacity style={style.titleWrap} onPress={this.goToDetail}>
-                      <Text style={style.titleNews}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={style.downWrap}>
-                    <Text style={style.timeText}>1 jam yang lalu</Text>
-                    <TouchableOpacity style={style.editButton} onPress={this.editNews}>
-                      <Text style={style.editText}>Edit</Text>
-                    </TouchableOpacity>
+            {Object.keys(myArticle).length==0 && <Spinner />}
+            {Object.keys(myArticle).length>0 && myArticle.map(item=>(
+              <View style={style.wrapper} key={item.id.toString().concat(item.title)}>
+                <View style={style.card}>
+                  <Image style={style.cardImage} source={{uri: `${APP_URL}/${item.image}`}} />
+                  <View style={style.rightSide}>
+                    <View style={style.upWrap}>
+                      <Text style={style.category}>{item.Category.category}</Text>
+                      <TouchableOpacity style={style.titleWrap} onPress={this.goToDetail}>
+                        <Text style={style.titleNews}>{item.title}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={style.downWrap}>
+                      <Text style={style.timeText}>{item.updatedAt}</Text>
+                      <TouchableOpacity style={style.editButton} onPress={()=>this.editNews(item.id)}>
+                        <Text style={style.editText}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
+            )) } 
           </ScrollView>
+          <View style={{height: 90, backgroundColor: 'white'}}></View>  
         </View>
       </View>
     )
@@ -65,10 +62,15 @@ class MyArticle extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  news: state.news,
-});
+  auth: state.auth,
+  profile: state.profile
+})
 
-export default connect(mapStateToProps)(MyArticle);
+const mapDispatchToProps = {
+  myArticle: profile.myArticle
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyArticle);
 
 const style = StyleSheet.create({
   imageWrapper: {

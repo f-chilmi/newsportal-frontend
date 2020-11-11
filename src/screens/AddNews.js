@@ -1,15 +1,25 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
 import { Header } from 'react-native-elements'
-import ImagePicker from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Spinner } from 'native-base'
+import ImagePicker from 'react-native-image-picker'
+import {connect} from 'react-redux'
+import {APP_URL} from '@env'
 
-export default class AddNews extends Component {
+import newsAction from '../redux/actions/news'
+
+class AddNews extends Component {
   state = {
     title: '',
     categoryId: '',
     picture: '',
     description: '',
+  }
+  post = () => {
+    const { title, categoryId, picture, description, id } = this.state
+    const category_id = categoryId
+    const data = { title, category_id, picture, description }
+    this.props.addNews(this.props.auth.token, data)
   }
   handleChoosePhoto = () => {
     const options = {};
@@ -66,7 +76,7 @@ export default class AddNews extends Component {
               value={this.state.description}
             />
           </View>
-          <TouchableOpacity style={style.postArticle}>
+          <TouchableOpacity style={style.postArticle} onPress={this.post}>
             <Text>Post article</Text>
           </TouchableOpacity>
           <View style={{height: 90, backgroundColor: 'grey'}}></View>  
@@ -75,6 +85,17 @@ export default class AddNews extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  news: state.news
+})
+
+const mapDispatchToProps = {
+  addNews: newsAction.addNews
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddNews);
 
 const style = StyleSheet.create({
   parent: {

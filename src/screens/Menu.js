@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Header, ListItem } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import HeaderComponent from '../components/HeaderComponent'
 
 const list = [
   {
@@ -63,15 +64,7 @@ export default class Menu extends Component {
   render() {
     return (
       <ScrollView>
-        <Header
-          backgroundColor='black'
-          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
-          rightComponent={
-            <TouchableOpacity>
-              <Icon name="search" color='white' size={20} />
-            </TouchableOpacity>
-          }
-        />
+        <HeaderComponent/>
         {
           list.map((item, i) => (
             <ListItem key={i} bottomDivider onPress={this.goToTrending}>

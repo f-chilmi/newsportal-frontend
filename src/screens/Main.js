@@ -10,6 +10,8 @@ import {connect} from 'react-redux';
 const Stack = createStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
+import HeaderComponent from '../components/HeaderComponent'
+import SearchBar from './SearchBar'
 import Home from './Home'
 import Detail from './Detail'
 import Trending from './Trending'
@@ -19,6 +21,19 @@ import MyArticle from './MyArticle'
 import AddNews from './AddNews'
 import EditNews from './EditNews'
 import Login from './Login'
+import Register from './Register'
+
+// const SearchBarStack = () => {
+//   return(
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         options={{headerShown: false}}
+//         name="SearchBar"
+//         component={SearchBar}
+//       />
+//     </Stack.Navigator>
+//   )
+// }
 
 const HomeStack = () => {
   return(
@@ -29,9 +44,13 @@ const HomeStack = () => {
         component={Home}
       />
       <Stack.Screen
-        // options=
         name="Detail"
         component={Detail}
+      />
+      <Stack.Screen
+        options={{headerShown: false}}
+        name="SearchBar"
+        component={SearchBar}
       />
     </Stack.Navigator>
   )
@@ -169,14 +188,24 @@ class Main extends Component {
           <Stack.Navigator>
             <Stack.Screen
               options={{headerShown: false}}
+              name="Register"
+              component={Register}
+            />
+            <Stack.Screen
+              options={{headerShown: false}}
               name="Login"
               component={Login}
             />
-            {/* <Stack.Screen
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="HeaderComponent"
+              component={HeaderComponent}
+            />
+            <Stack.Screen
               // options=
-              name="Detail"
-              component={Detail}
-            /> */}
+              name="SearchBar"
+              component={SearchBar}
+            />
           </Stack.Navigator>
         )}
         

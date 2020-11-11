@@ -8,7 +8,7 @@ export default {
   }),
   signup: (data) => ({
     type: 'SIGNUP',
-    payload: http().post('/auth/signup', qs.stringify(data)),
+    payload: http().post('/auth/register', qs.stringify(data)),
   }),
   logout: () => ({
     type: 'LOGOUT',

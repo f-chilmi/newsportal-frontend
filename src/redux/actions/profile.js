@@ -9,5 +9,9 @@ export default {
   changeProfile: (token, data) => ({
     type: 'CHANGE_PROFILE',
     payload: http(token).patch('/users', qs.stringify(data))
+  }),
+  myArticle: (token) => ({
+    type: 'MY_ARTICLE',
+    payload: http(token).get('/users/news')
   })
 };

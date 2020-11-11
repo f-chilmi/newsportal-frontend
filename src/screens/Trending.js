@@ -3,20 +3,13 @@ import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'rea
 import { Header } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import logo from '../assets/logokompas.png'
+import HeaderComponent from '../components/HeaderComponent'
 
 export default class Trending extends Component {
   render() {
     return (
       <View>
-        <Header
-          backgroundColor='black'
-          centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
-          rightComponent={
-            <TouchableOpacity>
-              <Icon name="search" color='white' size={20} />
-            </TouchableOpacity>
-          }
-        />
+        <HeaderComponent/>
         <ScrollView style={style.parent}>
           <View style={style.wrapper}>
             <View style={style.card}>
