@@ -4,7 +4,9 @@ const initialState = {
   isError: false,
   errorMsg: '',
   token: '',
-  alertMsg: ''
+  alertMsg: '',
+  email: '',
+  result: {}
 }
 
 export default (state = initialState, action) => {
@@ -12,7 +14,8 @@ export default (state = initialState, action) => {
     case 'AUTH_USER_PENDING': {
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        alertMsg: 'login loading',
       }
     }
     case 'AUTH_USER_REJECTED': {
@@ -43,7 +46,8 @@ export default (state = initialState, action) => {
     case 'SIGNUP_PENDING': {
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        alertMsg: 'signup pending',
       }
     }
     case 'SIGNUP_REJECTED': {
@@ -59,17 +63,41 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: false,
-        email: action.payload.data.success ? action.payload.data.result.email : '',
         alertMsg: action.payload.data.message
       }
     }
     case 'LOGOUT': {
-      localStorage.removeItem('token')
       return {
         ...state,
         isLogin: false,
-        token: ' ',
         alertMsg: 'Logout successfully'
+      }
+    }
+    case 'SAVE_EMAIL': {
+      return {
+        email: action.payload
+      }
+    }
+    case 'FORGOT_PASSWORD_PENDING': {
+      return {
+        ...state,
+        isLoading: true
+      }
+    }
+    case 'FORGOT_PASSWORD_REJECTED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        alertMsg: 'Failed reset password'
+      }
+    }
+    case 'FORGOT_PASSWORD_FULFILLED': {
+      return {
+        ...state,
+        isLoading: false,
+        result: action.payload.data,
+        alertMsg: 'Password changed',
       }
     }
     default: {

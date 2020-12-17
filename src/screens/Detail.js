@@ -2,22 +2,17 @@ import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import {Spinner} from 'native-base'
 import {connect} from 'react-redux'
-import store from '../redux/store'
 import {APP_URL} from '@env'
+import moment from 'moment'
 import newsAction from '../redux/actions/news'
 
 class Detail extends Component {
   componentDidMount() {
     const {id} = this.props.route.params;
-    store.dispatch(newsAction.detail(id))
+    this.props.detail(id)
   }
-  // componentDidUpdate() {
-  //   if(Object.keys(this.props.news.detail).length>0) {
-  //     store.dispatch(newsAction.newsByCategory(this.props.news.detail.category_id))
-  //   }
-  // }
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     const { detail } = this.props.news
     return (
       <View>
@@ -29,24 +24,11 @@ class Detail extends Component {
               <View style={style.contentWrapper}>
                 <Text style={style.title}>{detail.title}</Text>
                 <Text style={style.author}>{detail.User.name}</Text>
-                <Text style={style.writtenDate}>{detail.updatedAt}</Text>
+                <Text style={style.writtenDate}>{moment(detail.updatedAt).format('DD/MM/YY hh:mm')}</Text>
                 <Text style={style.content}>{detail.description}</Text>
-
-                {/* <View style={style.subcategoryWrapper}>
-                  <Text style={style.subcategory}>TERKAIT</Text>
-                  <Text style={style.titleSub}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak </Text>
-                  <Text style={style.titleSub}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak </Text>
-                  <Text style={style.titleSub}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak </Text>
-                  <Text style={style.titleSub}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak </Text>
-                  <Text style={style.titleSub}>Resiko covid-19 pada pasien stroke, bisa sebabkan pembekuan darah otak </Text>
-                </View> */}
-
               </View>
             </View>
-          )}
-          
-
-            
+          )}  
         </ScrollView>
       </View>
     )
@@ -54,10 +36,16 @@ class Detail extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  auth: state.auth,
   news: state.news,
 });
 
-export default connect(mapStateToProps)(Detail);
+const mapDispatchToProps = {
+  getNews: newsAction.getNews,
+  detail: newsAction.detail,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Detail);
 
 const style = StyleSheet.create({
   image: {

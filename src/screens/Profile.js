@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { View, Modal, Text, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, TextInput } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, TextInput, Modal, ActivityIndicator } from 'react-native'
 import { Header, Button } from 'react-native-elements'
 import { Form, Spinner, Label } from 'native-base'
 import {connect} from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import {APP_URL} from '@env'
 
+import auth from '../redux/actions/auth';
 import profile from '../redux/actions/profile'
 
 class Profile extends Component {
@@ -16,13 +17,16 @@ class Profile extends Component {
     name: '',
     email: '',
     birth: '',
-    picture: ''
+    picture: '',
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
   }
   componentDidMount() {
     this.props.getProfile(this.props.auth.token)
   }
   componentDidUpdate() {
-    if(Object.keys(this.props.profile.data).length>0){
+    if(this.props.profile.data !== undefined && Object.keys(this.props.profile.data).length>0){
       const { data } = this.props.profile
       if(this.state.name==''){
         this.setState({
@@ -33,48 +37,83 @@ class Profile extends Component {
       }
     }
   }
+  getData = () => {
+    this.props.getProfile(this.props.auth.token)
+  }
   changeImage = () => {
     this.setState({modalImage: true})
   }
   changeImageOnly = () => {
     const options = {};
-    ImagePicker.launchImageLibrary(options, (response) => {
-      console.log(response)
+    ImagePicker.showImagePicker(options, (response) => {
       if (response.uri) {
-        this.setState({picture: response, modalOpen: false});
+        this.setState({picture: response})
       }
     })
   }
-  // changePersonalInfo = () => {
-  //   this.setState({modalProfile: true})
-  // }
   changePassword = () => {
     this.setState({modalPassword: true})
+    const data = {
+      oldPassword: this.state.oldPassword,
+      newPassword: this.state.newPassword,
+      confirmNewPassword: this.state.confirmNewPassword,
+    }
+    this.props.changePassword(this.props.auth.token, data)
   }
   saveChangePersonalInfo = () => {
-    this.setState({modalProfile: false})
+    this.setState({
+      modalProfile: false,
+      modalImage: false
+    })
+    const form = new FormData()
+    form.append('picture', {
+      uri: String('file://'.concat(this.state.picture.path)),
+      type: this.state.picture.type,
+      name: this.state.picture.fileName,
+    })
+    form.append('name', this.state.name)
+    form.append('email', this.state.email)
+    form.append('birth', this.state.birth)
+    this.props.changeProfile1(this.props.auth.token, form)
+  }
+  edit = () => {
     const data = {
       name: this.state.name,
       email: this.state.email,
-      birth: this.state.birth,
-      picture: this.state.picture
+      birth: this.state.birth
     }
     this.props.changeProfile(this.props.auth.token, data)
+    this.setState({modalProfile: false})
+    this.getData()
+  }
+  logout = () => {
+    this.props.logout()
   }
   render() {
     const { name, email, birth } = this.state
+    console.log(this.state)
     return (
       <View >
         <Header
           backgroundColor='black'
           centerComponent={{text:"Settings", style: { color:'#fff' } }}          
         />
+        {this.props.profile.isLoading && (
+          <Modal transparent visible>
+            <View style={style.modalViewLoading}>
+              <View style={style.alertBox}>
+                <ActivityIndicator size="large" color="black" />
+                <Text style={style.textAlert}>Loading . . .</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
         {this.state.name == undefined && <Spinner />}
-        {this.state.name !== undefined && (
+        {this.props.profile.data !== undefined && (
           <View style={style.parent}>
             <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
-            {this.state.picture == '' ? (
-              (this.props.profile.data.image == '' ? (
+            {this.state.picture === '' ? (
+              (this.props.profile.data.image == null ? (
                 <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
               ) : (
                 <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
@@ -103,97 +142,112 @@ class Profile extends Component {
                 <Text style={style.labelName}>{birth}</Text>
               </View>
             </View>
-            <TouchableOpacity style={style.setting}>
-              <Text style={style.textSetting} onPress={this.changePassword}>Setting</Text>
+            <TouchableOpacity style={style.setting} onPress={this.changePassword}>
+              <Text style={style.textSetting} >Setting</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={style.setting}>
+            <TouchableOpacity style={style.setting} onPress={this.logout}>
               <Text style={style.textSetting}>Logout</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>        
+
+            <Modal transparent visible={this.state.modalImage}>
+              <View style={style.modalView1}>
+                <View style={style.avaWrapper}>
+                  {this.state.picture == '' ? (
+                    (this.props.profile.data.image == '' ? (
+                      <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
+                    ) : (
+                      <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
+                    ))
+                  ) : (
+                    <Image style={style.ava} source={this.state.picture}/>
+                  )}
+                </View>
+                <View style={style.buttonWrapper2}>
+                  <TouchableOpacity style={style.choosePhoto} onPress={this.changeImageOnly} >
+                    <Text>Choose</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={style.choosePhoto} onPress={()=>this.setState({modalImage: false})}>
+                    <Text>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={style.choosePhoto1} onPress={(this.saveChangePersonalInfo)} >
+                  <Text>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+
+            <Modal transparent visible={this.state.modalProfile}>
+              <KeyboardAvoidingView style={style.modalView}>
+                <Form style={style.form}>
+                  <Label style={style.label}>Full name</Label>
+                  <TextInput style={style.input} value={name} onChangeText={(text) => this.setState({name: text})} />
+                  <Label style={style.label}>Email</Label>
+                  <TextInput style={style.input} value={email} onChangeText={(text) => this.setState({email: text})} />
+                  <Label style={style.label}>Date of birth</Label>
+                  <TextInput style={style.input} value={birth} onChangeText={(text) => this.setState({birth: text})} />
+                </Form>
+                <View style={style.buttonWrapper}>
+                  <Button
+                    title="Cancel"
+                    type="outline"
+                    buttonStyle={style.buttonOutline}
+                    titleStyle={style.buttonTittle}
+                    onPress={()=>this.setState({modalProfile: false})}
+                  />
+                  <Button
+                    title="Save"
+                    type="outline"
+                    buttonStyle={style.buttonOutline}
+                    titleStyle={style.buttonTittle}
+                    onPress={this.edit}
+                  />
+                </View>
+              </KeyboardAvoidingView>
+            </Modal>
+
+            <Modal transparent visible={this.state.modalPassword}>
+              <KeyboardAvoidingView style={style.modalView}>
+                <Form style={style.form}>
+                  <TextInput 
+                    style={style.input} 
+                    placeholder="Current password" 
+                    secureTextEntry
+                    onChangeText={(text) => this.setState({oldPassword: text})}
+                  />
+                  <TextInput
+                    style={style.input}
+                    placeholder="New password"
+                    secureTextEntry
+                    onChangeText={(text) => this.setState({newPassword: text})}
+                  />
+                  <TextInput
+                    style={style.input}
+                    placeholder="Confirm new password"
+                    secureTextEntry
+                    onChangeText={(text) => this.setState({confirmNewPassword: text})}
+                  />
+                </Form>
+                <View style={style.buttonWrapper}>
+                  <Button
+                    title="Cancel"
+                    type="outline"
+                    buttonStyle={style.buttonOutline}
+                    titleStyle={style.buttonTittle}
+                    onPress={this.changePassword}
+                  />
+                  <Button
+                    title="Save"
+                    type="outline"
+                    buttonStyle={style.buttonOutline}
+                    titleStyle={style.buttonTittle}
+                    onPress={()=>this.setState({modalPassword: false})}
+                  />
+                </View>
+              </KeyboardAvoidingView>
+            </Modal>
+
           </View>
         )}
-
-        <Modal transparent visible={this.state.modalImage}>
-          <View style={style.modalView1}>
-            <View style={style.avaWrapper}>
-              {this.state.picture == '' ? (
-                (this.props.profile.data.image == '' ? (
-                  <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
-                ) : (
-                  <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
-                ))
-              ) : (
-                <Image style={style.ava} source={this.state.picture}/>
-              )}
-            </View>
-            <View style={style.buttonWrapper2}>
-              <TouchableOpacity style={style.choosePhoto} onPress={this.changeImageOnly} >
-                <Text>Choose</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={style.choosePhoto} onPress={()=>this.setState({modalImage: false})}>
-                <Text>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={style.choosePhoto1} onPress={(this.saveChangePersonalInfo)} >
-              <Text>Save</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-        <Modal transparent visible={this.state.modalProfile}>
-          <KeyboardAvoidingView style={style.modalView}>
-            <Form style={style.form}>
-              <Label style={style.label}>Full name</Label>
-              <TextInput style={style.input} value={name} onChangeText={(text) => this.setState({name: text})} />
-              <Label style={style.label}>Email</Label>
-              <TextInput style={style.input} value={email} onChangeText={(text) => this.setState({email: text})} />
-              <Label style={style.label}>Date of birth</Label>
-              <TextInput style={style.input} value={birth} onChangeText={(text) => this.setState({birth: text})} />
-            </Form>
-            <View style={style.buttonWrapper}>
-              <Button
-                title="Cancel"
-                type="outline"
-                buttonStyle={style.buttonOutline}
-                titleStyle={style.buttonTittle}
-                onPress={()=>this.setState({modalProfile: false})}
-              />
-              <Button
-                title="Save"
-                type="outline"
-                buttonStyle={style.buttonOutline}
-                titleStyle={style.buttonTittle}
-                onPress={this.saveChangePersonalInfo}
-              />
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
-
-        <Modal transparent visible={this.state.modalPassword}>
-          <KeyboardAvoidingView style={style.modalView}>
-            <Form style={style.form}>
-              <TextInput style={style.input} placeholder="Current password" secureTextEntry={true} />
-              <TextInput style={style.input} placeholder="New password" secureTextEntry={true}/>
-              <TextInput style={style.input} placeholder="Confirm new password" secureTextEntry={true} />
-            </Form>
-            <View style={style.buttonWrapper}>
-              <Button
-                title="Cancel"
-                type="outline"
-                buttonStyle={style.buttonOutline}
-                titleStyle={style.buttonTittle}
-                onPress={()=>this.setState({modalPassword: false})}
-              />
-              <Button
-                title="Save"
-                type="outline"
-                buttonStyle={style.buttonOutline}
-                titleStyle={style.buttonTittle}
-                onPress={()=>this.setState({modalPassword: false})}
-              />
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
-
       </View>
     )
   }
@@ -207,6 +261,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   getProfile: profile.getProfile,
   changeProfile: profile.changeProfile,
+  changeProfile1: profile.changeProfile1,
+  logout: auth.logout,
+  changePassword: profile.changePassword,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
@@ -340,5 +397,25 @@ const style = StyleSheet.create({
   buttonTittle: {
     fontSize: 14,
     color: 'black'
+  },
+  modalViewLoading: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

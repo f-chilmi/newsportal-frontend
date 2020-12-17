@@ -1,18 +1,20 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import {Spinner} from 'native-base'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native'
 import {connect} from 'react-redux'
 import {APP_URL} from '@env'
+import moment from 'moment'
 
 import HeaderComponent from '../components/HeaderComponent'
 import profile from '../redux/actions/profile'
+import newsAction from '../redux/actions/news'
 
 class MyArticle extends Component {
   state = {
-    
+    refreshing: false
   }
   componentDidMount() {
     this.props.myArticle(this.props.auth.token)
+    this.props.getNews()
   }
   addNews = () => {
     this.props.navigation.navigate('AddNews')
@@ -20,18 +22,45 @@ class MyArticle extends Component {
   editNews = (id) => {
     this.props.navigation.navigate('EditNews', {id})
   }
+  onRefresh = () => {
+    this.setState({refreshing: true});
+    this.props.myArticle(this.props.auth.token)
+    this.props.getNews()
+    setTimeout(() => {
+      this.setState({refreshing: false})
+    }, 500);
+  };
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     const { myArticle } = this.props.profile
+    const today = moment(new Date()).format('DD/MM/YY')
     return (
-      <View>
+      <>
         <HeaderComponent />
         <View style={style.parent}>
           <TouchableOpacity style={style.buttonAdd} onPress={this.addNews}>
             <Text style={style.textAdd}>Add new article</Text>
           </TouchableOpacity>
-          <ScrollView>
-            {Object.keys(myArticle).length==0 && <Spinner />}
+          {this.props.profile.isLoading && (
+            <Modal transparent visible>
+              <View style={style.modalView}>
+                <View style={style.alertBox}>
+                  <ActivityIndicator size="large" color="black" />
+                  <Text style={style.textAlert}>Loading . . .</Text>
+                </View>
+              </View>
+            </Modal>
+          )}
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh}
+              />
+            }>
+            {Object.keys(myArticle).length==0 && (
+              <Text>You have no article. Start writing!</Text>
+            )}
             {Object.keys(myArticle).length>0 && myArticle.map(item=>(
               <View style={style.wrapper} key={item.id.toString().concat(item.title)}>
                 <View style={style.card}>
@@ -44,7 +73,11 @@ class MyArticle extends Component {
                       </TouchableOpacity>
                     </View>
                     <View style={style.downWrap}>
-                      <Text style={style.timeText}>{item.updatedAt}</Text>
+                      {today===moment(item.createdAt).format('DD/MM/YY') ? (
+                        <Text style={style.timeText}> {moment(item.updatedAt).format('HH:mm')}</Text>
+                      ):(
+                      <Text style={style.timeText}>{moment(item.updatedAt).format('DD/MM/YY')}</Text>
+                      )}
                       <TouchableOpacity style={style.editButton} onPress={()=>this.editNews(item.id)}>
                         <Text style={style.editText}>Edit</Text>
                       </TouchableOpacity>
@@ -53,21 +86,22 @@ class MyArticle extends Component {
                 </View>
               </View>
             )) } 
-          </ScrollView>
-          <View style={{height: 90, backgroundColor: 'white'}}></View>  
+          </ScrollView> 
         </View>
-      </View>
+      </>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
-  profile: state.profile
+  profile: state.profile,
+  news: state.news,
 })
 
 const mapDispatchToProps = {
-  myArticle: profile.myArticle
+  myArticle: profile.myArticle,
+  getNews: newsAction.getNews,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyArticle);
@@ -82,7 +116,8 @@ const style = StyleSheet.create({
     height: '100%'
   },
   parent: {
-    padding: '3%'
+    padding: '3%',
+    flex: 1,
   },
   buttonAdd: {
     width: '100%',
@@ -150,5 +185,25 @@ const style = StyleSheet.create({
   },
   editText: {
     fontSize: 10
+  },
+  modalView: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

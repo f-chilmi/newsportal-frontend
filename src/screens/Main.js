@@ -22,6 +22,10 @@ import AddNews from './AddNews'
 import EditNews from './EditNews'
 import Login from './Login'
 import Register from './Register'
+import Splash from './Splash'
+import Landing from './Landing'
+import ForgotPw from './ForgotPw'
+import ResetPw from './ResetPw'
 
 // const SearchBarStack = () => {
 //   return(
@@ -133,7 +137,7 @@ const ProfileStack = () => {
 
 class Main extends Component {
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <NavigationContainer>
         {this.props.auth.isLogin ? (
@@ -159,7 +163,7 @@ class Main extends Component {
             <BottomTabs.Screen
               options={{
                 tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="folder" size={25} color="#900" />
+                  <Icon name="folder" size={25} color="black" />
                 ),
               }}
               name="Menu"
@@ -186,6 +190,16 @@ class Main extends Component {
           </BottomTabs.Navigator>
         ) : (
           <Stack.Navigator>
+            {/* <Stack.Screen
+              options={{headerShown: false}}
+              name="Splash"
+              component={Splash}
+            /> */}
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="Landing"
+              component={Landing}
+            />
             <Stack.Screen
               options={{headerShown: false}}
               name="Register"
@@ -195,6 +209,16 @@ class Main extends Component {
               options={{headerShown: false}}
               name="Login"
               component={Login}
+            />
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="ForgotPw"
+              component={ForgotPw}
+            />
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="ResetPw"
+              component={ResetPw}
             />
             <Stack.Screen
               options={{headerShown: false}}

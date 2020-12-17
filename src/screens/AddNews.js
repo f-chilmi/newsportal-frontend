@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, TextInput, Modal, ActivityIndicator } from 'react-native'
 import { Header } from 'react-native-elements'
 import { Spinner } from 'native-base'
 import ImagePicker from 'react-native-image-picker'
@@ -7,37 +7,61 @@ import {connect} from 'react-redux'
 import {APP_URL} from '@env'
 
 import newsAction from '../redux/actions/news'
+import profile from '../redux/actions/profile'
 
 class AddNews extends Component {
   state = {
     title: '',
     categoryId: '',
-    picture: '',
+    picture: {},
+    image: '',
     description: '',
   }
   post = () => {
-    const { title, categoryId, picture, description, id } = this.state
-    const category_id = categoryId
-    const data = { title, category_id, picture, description }
-    this.props.addNews(this.props.auth.token, data)
+    const form = new FormData()
+    form.append('picture', {
+      uri: String('file://'.concat(this.state.image.path)) ,
+      type: this.state.image.type,
+      name: this.state.image.fileName,
+    })
+    form.append('title', this.state.title)
+    form.append('category_id', this.state.categoryId)
+    form.append('description', this.state.description)
+    this.props.addNews(this.props.auth.token, form)
   }
   handleChoosePhoto = () => {
-    const options = {};
-    ImagePicker.launchImageLibrary(options, (response) => {
-      console.log(response)
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 1000,
+      maxHeight: 1000,
+    };
+    ImagePicker.showImagePicker(options, (response) => {
       if (response.uri) {
-        this.setState({picture: response.uri, modalOpen: false});
+        this.setState({image: response})
       }
     })
   }
+  goToMyArticle = () => {
+    this.props.navigation.navigate('MyArticle')
+  }
   render() {
-    console.log(this.state)
     return (
       <View >
         <Header
           backgroundColor='black'
           centerComponent={{text:"Add new article", style: { color:'#fff' } }}          
         />
+        {this.props.news.isLoading && (
+          <Modal transparent visible>
+            <View style={style.modalView}>
+              <View style={style.alertBox}>
+                <ActivityIndicator size="large" color="black" />
+                <Text style={style.textAlert}>Loading . . .</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
+        {this.props.news.alertMsg === 'add news success' ? this.goToMyArticle() : null}
         <ScrollView style={style.parent}>
           <View style={style.inputWrapper}>
             <Text style={style.label}>Title</Text>
@@ -60,7 +84,7 @@ class AddNews extends Component {
           <View style={style.inputWrapper}>
             <Text style={style.label}>Picture</Text>
             {this.state.picture !== '' && (
-              <Image source={{uri: this.state.picture}} style={{width: 100, height: 100}}/>
+              <Image source={this.state.image} style={{width: 100, height: 100}}/>
             )}
             <TouchableOpacity style={style.choosePhoto} onPress={this.handleChoosePhoto}>
               <Text>Choose photo</Text>
@@ -88,11 +112,13 @@ class AddNews extends Component {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
-  news: state.news
+  news: state.news,
+  profile: state.profile,
 })
 
 const mapDispatchToProps = {
-  addNews: newsAction.addNews
+  addNews: newsAction.addNews,
+  myArticle: profile.myArticle,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddNews);
@@ -131,5 +157,25 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 35
+  },
+  modalView: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

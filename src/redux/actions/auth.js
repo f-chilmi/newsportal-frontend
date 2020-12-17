@@ -13,4 +13,12 @@ export default {
   logout: () => ({
     type: 'LOGOUT',
   }),
+  saveEmail: (email) => ({
+    type: 'SAVE_EMAIL',
+    payload: email
+  }),
+  forgotPassword: (data) => ({
+    type: 'FORGOT_PASSWORD',
+    payload: http().patch('/auth/forgotpassword', qs.stringify(data))
+  })
 };

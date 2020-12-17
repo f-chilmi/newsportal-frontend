@@ -2,8 +2,12 @@ import http from '../../helpers/http'
 import qs from 'querystring'
 
 export default {
-  getNews: (search='') => ({
+  getNews: () => ({
     type: 'GET_NEWS',
+    payload: http().get('/public'),
+  }),
+  search: (search='') => ({
+    type: 'SEARCH_NEWS',
     payload: http().get(`/public?search=${search}`),
   }),
   detail: (id) => ({
@@ -18,8 +22,12 @@ export default {
     type: 'EDIT_NEWS',
     payload: http(token).patch(`/news/${id}`, qs.stringify(data))
   }),
-  addNews: (token, data) => ({
+  editNews1: (token, id, data) => ({
+    type: 'EDIT_NEWS',
+    payload: http(token).patch(`/news/${id}`, data)
+  }),
+  addNews: (token, form) => ({
     type: 'ADD_NEWS',
-    payload: http(token).post('/news', qs.stringify(data))
+    payload: http(token).post('/news', form)
   }),
 };

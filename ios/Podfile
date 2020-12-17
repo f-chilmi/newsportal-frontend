@@ -3,12 +3,14 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
-target 'NewsPortalMobile' do
+target 'Newsportal' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
-  target 'NewsPortalMobileTests' do
+  pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+
+  target 'NewsportalTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -23,10 +25,10 @@ target 'NewsPortalMobile' do
   end
 end
 
-target 'NewsPortalMobile-tvOS' do
-  # Pods for NewsPortalMobile-tvOS
+target 'Newsportal-tvOS' do
+  # Pods for Newsportal-tvOS
 
-  target 'NewsPortalMobile-tvOSTests' do
+  target 'Newsportal-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

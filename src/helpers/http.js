@@ -5,7 +5,7 @@ const http = (token = null) => {
   return axios.create({
     baseURL: APP_URL,
     headers: {
-      Authorization: token ? `Bearer ${token}` : undefined,
+      Authorization: token ? `Bearer ${token}` : undefined
     },
   });
 };

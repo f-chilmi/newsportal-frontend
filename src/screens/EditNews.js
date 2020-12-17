@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, TextInput, Modal, ActivityIndicator } from 'react-native'
 import { Header } from 'react-native-elements'
 import { Spinner } from 'native-base'
 import ImagePicker from 'react-native-image-picker'
 import {connect} from 'react-redux'
 import {APP_URL} from '@env'
+import qs from 'querystring';
 
 import newsAction from '../redux/actions/news'
 
@@ -35,21 +36,42 @@ class EditNews extends Component {
     }
   }
   post = () => {
-    const { title, categoryId, picture, description, id } = this.state
-    const data = { title, categoryId, picture, description }
-    this.props.editNews(this.props.auth.token, id, data)
+    const form = new FormData()
+    form.append('picture', {
+      uri: String('file://'.concat(this.state.image.path)) ,
+      type: this.state.image.type,
+      name: this.state.image.fileName,
+    })
+    form.append('title', this.state.title)
+    form.append('category_id', this.state.categoryId)
+    form.append('description', this.state.description)
+    this.props.editNews1(this.props.auth.token, this.state.id, form)
+  }
+  edit = () => {
+    const data = {
+      title: this.state.title,
+      categoryId: this.state.categoryId,
+      description: this.state.description,
+    }
+    this.props.editNews1(this.props.auth.token, this.state.id, qs.stringify(data))
   }
   handleChoosePhoto = () => {
-    const options = {};
-    ImagePicker.launchImageLibrary(options, (response) => {
-      console.log(response)
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 1000,
+      maxHeight: 1000,
+    };
+    ImagePicker.showImagePicker(options, (response) => {
       if (response.uri) {
-        this.setState({picture: response.uri, modalOpen: false});
+        this.setState({image: response})
       }
     })
   }
+  goToMyArticle = () => {
+    this.props.navigation.navigate('MyArticle')
+  }
   render() {
-    console.log(this.state)
+    // console.log(this.state)
     const { title, categoryId, picture, description, id } = this.state
     return (
       <View >
@@ -58,6 +80,17 @@ class EditNews extends Component {
           centerComponent={{text:"Edit article", style: { color:'#fff' } }}          
         />
         {id == undefined && <Spinner />}
+        {this.props.news.isLoading && (
+          <Modal transparent visible>
+            <View style={style.modalView}>
+              <View style={style.alertBox}>
+                <ActivityIndicator size="large" color="black" />
+                <Text style={style.textAlert}>Loading . . .</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
+        {this.props.news.alertMsg === 'edit success' ? this.goToMyArticle() : null}
         {id !== undefined && id == this.props.route.params.id && (
           <ScrollView style={style.parent}>
             <View style={style.inputWrapper}>
@@ -81,8 +114,14 @@ class EditNews extends Component {
             <View style={style.inputWrapper}>
               <Text style={style.label}>Picture</Text>
               <View style={{width: '100%', height: 200}}>
+                {this.props.news.detail.image !== null && (
+                  <Image 
+                    source={{uri: `${APP_URL}/${this.props.news.detail.image}`}}
+                    style={{width: '100%', height: '100%'}}
+                  />
+                )}
                 {picture !== '' && (
-                  <Image source={{uri: `${APP_URL}/${picture}`}} style={{width: '100%', height: '100%'}}/>
+                  <Image source={this.state.image} style={{width: '100%', height: '100%'}}/>
                 )}
               </View>
               <TouchableOpacity style={style.choosePhoto} onPress={this.handleChoosePhoto}>
@@ -99,7 +138,11 @@ class EditNews extends Component {
                 value={description}
               />
             </View>
-            <TouchableOpacity style={style.postArticle} onPress={this.post}>
+            <TouchableOpacity 
+              style={style.postArticle} 
+              onPress={this.state.picture === this.props.news.detail.image 
+              ? this.edit 
+              : this.post}>
               <Text>Post article</Text>
             </TouchableOpacity>
             <View style={{height: 90, backgroundColor: 'grey'}}></View>  
@@ -118,7 +161,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   detail: newsAction.detail,
-  editNews: newsAction.editNews
+  editNews: newsAction.editNews,
+  editNews1: newsAction.editNews1,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditNews);
@@ -157,5 +201,25 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 35
+  },
+  modalView: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

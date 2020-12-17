@@ -1,28 +1,27 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native'
 import {Spinner} from 'native-base'
 import {Header} from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import {connect} from 'react-redux'
-import logo from '../assets/logokompas.png'
+import logo from '../assets/logokompas.jpg'
 import {APP_URL} from '@env'
+import moment from 'moment'
+import SplashScreen from 'react-native-splash-screen'
 
-import HeaderComponent from '../components/HeaderComponent'
-
-import store from '../redux/store';
 import newsAction from '../redux/actions/news';
 
 class Home extends Component {
+  state = {
+    refreshing: false
+  }
   componentDidMount() {
+    SplashScreen.hide();
     if(!(this.props.news.configHome=='/public?search=')){
-      store.dispatch(newsAction.getNews())
+      this.props.getNews()
     }
   }
-  // componentDidUpdate() {
-  //   if(!(this.props.news.configHome=='/public?search=')){
-  //     store.dispatch(newsAction.getNews())
-  //   }
-  // }
+  
   goToDetail = (id) => {
     this.props.navigation.navigate('Detail', {id});
   }
@@ -38,10 +37,17 @@ class Home extends Component {
   search = () => {
     this.props.navigation.navigate('SearchBar')
   }
+  onRefresh = () => {
+    this.setState({refreshing: true});
+    this.props.getNews()
+    setTimeout(() => {
+      this.setState({refreshing: false})
+    }, 500);
+  };
   render() {
     const {data} = this.props.news
-    console.log(this.props)
-    console.log(!(this.props.news.configHome=='/public?search='))
+    const today = moment(new Date()).format('DD/MM/YY')
+    // console.log(this.props)
     return (
       <View>
         <Header
@@ -55,7 +61,14 @@ class Home extends Component {
         />
         {Object.keys(data).length==0 && <Spinner />}
         {Object.keys(data).length>0 && (
-          <ScrollView style={style.parent}>
+          <ScrollView 
+            style={style.parent}
+            refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />
+          }>
             <View style={style.wrapper}>
               <Text style={style.sorotan}>SOROTAN</Text>
               {data.rows.map(item=>(
@@ -69,7 +82,12 @@ class Home extends Component {
                       </TouchableOpacity>
                     </View>
                     <View style={style.downWrap}>
-                      <Text style={style.timeText}>{item.updatedAt}</Text>
+                      {/* <Text style={style.timeText}>{item.updatedAt}</Text> */}
+                      {today===moment(item.createdAt).format('DD/MM/YY') ? (
+                        <Text style={style.timeText}> {moment(item.createdAt).format('HH:mm')}</Text>
+                      ):(
+                      <Text style={style.timeText}>{moment(item.createdAt).format('DD/MM/YY')}</Text>
+                      )}
                       <TouchableOpacity><Icon name="bookmark" size={22} /></TouchableOpacity>
                     </View>
                   </View>
@@ -87,10 +105,15 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  auth: state.auth,
   news: state.news,
-})
+});
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = {
+  getNews: newsAction.getNews,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const style = StyleSheet.create({
   parent: {
@@ -100,11 +123,11 @@ const style = StyleSheet.create({
     marginBottom: 10
   },
   imageWrapper: {
-    width: 160,
+    width: 200,
     height: 18
   },
   logoimage: {
-    width: '90%',
+    width: '100%',
     height: '100%'
   },
   sorotan: {

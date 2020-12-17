@@ -6,11 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
+import {Formik} from 'formik';
+import * as yup from 'yup';
 
 import store from '../redux/store';
 import auth from '../redux/actions/auth';
+
+const formSchema = yup.object({
+  email: yup
+    .string()
+    .email('Must be a valid your@mail.com')
+    .required('Email required'),
+  password: yup.string().min(8, 'Password length min 8').required('Password required'),
+});
 
 class Login extends Component {
   state = {
@@ -18,6 +30,10 @@ class Login extends Component {
     password: '',
     alertMsg: ''
   };
+
+  goToForgotPw = () => {
+    this.props.navigation.navigate('ForgotPw')
+  }
 
   doLogin = () => {
     const {email, password} = this.state;
@@ -33,42 +49,82 @@ class Login extends Component {
     }
   }
 
-  componentDidUpdate() {
-    this.showAlert()
-  }
-
   render() {
     // console.log(this.props)
     return (
       <View style={style.parent}>
-        <View style={style.signupWrapper}>
-          <Text style={style.signupText}>Login</Text>
-        </View>
-        <View style={style.parentContent}>
-          <View style={style.inputWrapper}>
-            <Text style={style.labelText}>Email</Text>
-            <TextInput
-              name="email"
-              onChangeText={(text) => this.setState({email: text})}
-            />
-          </View>
-          <View style={style.inputWrapper}>
-            <Text style={style.labelText}>Password</Text>
-            <TextInput
-              name="password"
-              onChangeText={(text) => this.setState({password: text})}
-              secureTextEntry={true}
-            />
-          </View>
-        </View>
-        <TouchableOpacity style={style.textAlready}>
-          <Text style={style.textAlready1}>Forgot password? </Text>
-        </TouchableOpacity>
-        <View style={style.btnWrapper}>
-          <TouchableOpacity style={style.btn} onPress={this.doLogin}>
-            <Text style={style.textButton}>LOGIN</Text>
-          </TouchableOpacity>
-        </View>
+        {this.props.auth.isLoading &&
+          this.props.auth.alertMsg === 'login loading' && (
+            <Modal transparent visible>
+              <View style={style.modalView}>
+                <View style={style.alertBox}>
+                  <ActivityIndicator size="large" color="black" />
+                  <Text style={style.textAlert}>Loading . . .</Text>
+                </View>
+              </View>
+            </Modal>
+          )}
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={formSchema}
+          onSubmit={(values) => this.props.login(values)}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <>
+              <View style={style.signupWrapper}>
+                <Text style={style.signupText}>Login</Text>
+              </View>
+              <View style={style.parentContent}>
+                <View style={style.inputWrapper}>
+                  <Text style={style.labelText}>Email</Text>
+                  <TextInput
+                    name="email"
+                    placeholder="Input your email"
+                    placeholderTextColor="#858D96"
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    value={values.email}
+                  />
+                </View>
+                <Text style={style.txtError}>
+                  {touched.email && errors.email}
+                </Text>
+                <View style={style.inputWrapper}>
+                  <Text style={style.labelText}>Password</Text>
+                  <TextInput
+                    name="password"
+                    placeholder="Input your password"
+                    placeholderTextColor="#858D96"
+                    secureTextEntry
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    value={values.password}
+                  />
+                </View>
+                <Text style={style.txtError}>
+                  {touched.password && errors.password}
+                </Text>
+              </View>
+              <TouchableOpacity style={style.textAlready} onPress={this.goToForgotPw}>
+                <Text style={style.textAlready1}>Forgot password? </Text>
+              </TouchableOpacity>
+              <View style={style.btnWrapper}>
+                <TouchableOpacity style={style.btn} onPress={() => handleSubmit()}>
+                  <Text style={style.textButton}>LOGIN</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </Formik>
       </View>
     );
   }
@@ -77,6 +133,10 @@ const style = StyleSheet.create({
   parent: {
     backgroundColor: '#E5E5E5',
     flex: 1,
+  },
+  txtError: {
+    fontSize: 11,
+    color: 'red',
   },
   signupWrapper: {
     marginLeft: '5%',
@@ -113,6 +173,7 @@ const style = StyleSheet.create({
   },
   textAlready1: {
     fontSize: 12,
+    color: 'grey'
   },
   btnWrapper: {
     justifyContent: 'center',
@@ -132,6 +193,26 @@ const style = StyleSheet.create({
   textButton: {
     color: 'black',
     fontWeight: 'bold',
+  },
+  modalView: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 });
 

@@ -3,7 +3,7 @@ import { View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Header } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import logo from '../assets/logokompas.png'
+import logo from '../assets/logokompas.jpg'
 
 export default class HeaderComponent extends Component {
   goToLogin = () => {
@@ -32,11 +32,11 @@ export default class HeaderComponent extends Component {
 
 const style = StyleSheet.create({
   imageWrapper: {
-    width: 160,
+    width: 200,
     height: 18
   },
   logoimage: {
-    width: '90%',
+    width: '100%',
     height: '100%'
   },
 })

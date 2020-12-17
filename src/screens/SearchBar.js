@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native'
 import { SearchBar as SearchComponent } from 'react-native-elements'
 import { Spinner } from 'native-base'
 import {APP_URL} from '@env'
@@ -12,26 +12,36 @@ class SearchBar extends Component {
   state = {
     search: ''
   }
-  updateSearch = (text) => {
-    this.setState({search: text})
-    this.props.getNews(this.state.search)
+  updateSearch = () => {
+    this.props.search(this.state.search)
   }
   goToDetail = (id) => {
     this.props.navigation.navigate('Detail', {id});
   }
   render() {
     console.log(this.state.search)
-    const {data} = this.props.news
+    const data = this.props.news.search
     return (
       <View style={{flex: 1, paddingTop: 20}}>
         <SearchComponent
           round
           placeholder="Search"
-          onChangeText={(text)=>this.updateSearch(text)}
+          onChangeText={(text)=>this.setState({search: text})}
           value={this.state.search}
+          onSubmitEditing={this.updateSearch}
         />
-        {Object.keys(data).length==0 && <Spinner />}
-        {this.state.search!=='' && Object.keys(data).length>0 && (
+        {this.props.news.isLoading && (
+          <Modal transparent visible>
+            <View style={style.modalView}>
+              <View style={style.alertBox}>
+                <ActivityIndicator size="large" color="black" />
+                <Text style={style.textAlert}>Loading . . .</Text>
+              </View>
+            </View>
+          </Modal>
+        )}
+        {data === 'undefined' && <Spinner />}
+        {data !== undefined && (
           <ScrollView style={style.parent}>
             <View style={style.wrapper}>
               <Text style={style.sorotan}>SOROTAN</Text>
@@ -65,7 +75,7 @@ class SearchBar extends Component {
 const mapStateToProps = (state) => ({news: state.news});
 
 const mapDispatchToProps = {
-  getNews: news.getNews,
+  search: news.search,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
@@ -132,5 +142,25 @@ const style = StyleSheet.create({
   timeText: {
     fontSize: 8,
     color: 'grey'
+  },
+  modalView: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

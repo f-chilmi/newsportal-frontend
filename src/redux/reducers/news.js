@@ -31,7 +31,29 @@ export default (state = initialState, action) => {
         isLoading: false,
         isLogin: true,
         data: action.payload.data.result,
-        configHome: action.payload.config.url
+        configHome: action.payload.config.url,
+        alertMsg: 'success get news',
+      }
+    }
+    case 'SEARCH_NEWS_PENDING': {
+      return {
+        ...state,
+        isLoading: true
+      }
+    }
+    case 'SEARCH_NEWS_REJECTED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      }
+    }
+    case 'SEARCH_NEWS_FULFILLED': {
+      return {
+        ...state,
+        isLoading: false,
+        isLogin: true,
+        search: action.payload.data.result,
       }
     }
     case 'DETAIL_PENDING': {
@@ -79,7 +101,8 @@ export default (state = initialState, action) => {
     case 'EDIT_NEWS_PENDING': {
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        alertMsg: 'edit pending',
       }
     }
     case 'EDIT_NEWS_REJECTED': {
@@ -94,7 +117,8 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: true,
-        dataEdit: action.payload.data.result
+        dataEdit: action.payload.data.result,
+        alertMsg: 'edit success',
       }
     }
     case 'ADD_NEWS_PENDING': {
@@ -114,7 +138,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        isLogin: true,
+        alertMsg: 'add news success',
         addData: action.payload.data.result
       }
     }
