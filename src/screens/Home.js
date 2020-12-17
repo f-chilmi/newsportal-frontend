@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native'
+import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native'
 import {Spinner} from 'native-base'
 import {Header} from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -57,7 +57,7 @@ class Home extends Component {
     const today = moment(new Date()).format('DD/MM/YY')
     // console.log(this.props)
     return (
-      <View>
+      <View style={style.parent0}>
         <Header
           backgroundColor='black'
           centerComponent={<View style={style.imageWrapper}><Image style={style.logoimage} source={logo} /></View>}
@@ -67,10 +67,21 @@ class Home extends Component {
             </TouchableOpacity>
           }
         />
+        {this.props.bookmark.isLoading && (
+          <Modal transparent visible>
+            <View style={style.modalViewLoading}>
+              <View style={style.alertBox}>
+                <ActivityIndicator size="large" color="black" />
+                <Text style={style.textAlert}>Loading . . .</Text>
+              </View>
+            </View>
+          </Modal>
+        )}   
         {Object.keys(data).length==0 && <Spinner />}
         {Object.keys(data).length>0 && (
           <ScrollView 
             style={style.parent}
+            bounces={true}
             refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
@@ -103,8 +114,6 @@ class Home extends Component {
                 </View>
               ))}
             </View>
-              
-            <View style={{height: 90, backgroundColor: 'transparent'}}></View>     
           </ScrollView>
         )}
         
@@ -127,8 +136,11 @@ const mapDispatchToProps = {
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const style = StyleSheet.create({
+  parent0: {
+    flex: 1,
+  },
   parent: {
-    padding: '2%'
+    padding: '2%',
   },
   wrapper: {
     marginBottom: 10
@@ -188,5 +200,25 @@ const style = StyleSheet.create({
   timeText: {
     fontSize: 8,
     color: 'grey'
+  },
+  modalViewLoading: {
+    backgroundColor: 'grey',
+    opacity: 0.8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertBox: {
+    width: 200,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAlert: {
+    color: 'black',
+    marginTop: 20,
+    textAlign: 'center',
   },
 })

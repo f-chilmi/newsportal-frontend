@@ -26,6 +26,7 @@ import Splash from './Splash'
 import Landing from './Landing'
 import ForgotPw from './ForgotPw'
 import ResetPw from './ResetPw'
+import Bookmark from './Bookmark'
 
 // const SearchBarStack = () => {
 //   return(
@@ -38,6 +39,58 @@ import ResetPw from './ResetPw'
 //     </Stack.Navigator>
 //   )
 // }
+
+const Tabbed = () => {
+  return(
+    <BottomTabs.Navigator>
+      <BottomTabs.Screen
+        options={{
+          tabBarIcon: ({size, color, focused}) => (
+            <Icon name="home" size={20} color={color} />
+          ),
+        }}
+        name="Home"
+        component={Home}
+      />
+      <BottomTabs.Screen
+        options={{
+          tabBarIcon: ({size, color, focused}) => (
+            <Icon name="edit" size={20} color={color} />
+          ),
+        }}
+        name="Write"
+        component={MyArticle}
+      />
+      <BottomTabs.Screen
+        options={{
+          tabBarIcon: ({size, color, focused}) => (
+            <Icon name="folder" size={25} color="black" />
+          ),
+        }}
+        name="Menu"
+        component={Menu}
+      />
+      <BottomTabs.Screen
+        options={{
+          tabBarIcon: ({size, color, focused}) => (
+            <Icon name="bookmark" size={20} color={color} />
+          ),
+        }}
+        name="Bookmark"
+        component={Bookmark}
+      />
+      <BottomTabs.Screen
+        options={{
+          tabBarIcon: ({size, color, focused}) => (
+            <Icon name="user" size={20} color={color} />
+          ),
+        }}
+        name="Profile"
+        component={Profile}
+      />
+    </BottomTabs.Navigator>
+  )
+}
 
 const HomeStack = () => {
   return(
@@ -71,7 +124,7 @@ const EditStack = () => {
         options={{headerShown: false}}
         name="AddNews"
         component={AddNews} />
-        <Stack.Screen 
+      <Stack.Screen 
         options={{headerShown: false}}
         name="EditNews"
         component={EditNews} />
@@ -104,6 +157,11 @@ const MenuStack = () => {
 const BookmarkStack = () => {
   return(
     <Stack.Navigator>
+      <Stack.Screen
+        options={{headerShown: false}}
+        name="Bookmark"
+        component={Bookmark}
+      />
       <Stack.Screen
         options={{headerShown: false}}
         name="Trending"
@@ -141,53 +199,37 @@ class Main extends Component {
     return (
       <NavigationContainer>
         {this.props.auth.isLogin ? (
-          <BottomTabs.Navigator>
-            <BottomTabs.Screen
-              options={{
-                tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="home" size={20} color={color} />
-                ),
-              }}
-              name="Home"
-              component={HomeStack}
+          <Stack.Navigator>
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="Tabbed"
+              component={Tabbed}
             />
-            <BottomTabs.Screen
-              options={{
-                tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="edit" size={20} color={color} />
-                ),
-              }}
-              name="Write"
-              component={EditStack}
+            <Stack.Screen
+              name="Detail"
+              component={Detail}
             />
-            <BottomTabs.Screen
-              options={{
-                tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="folder" size={25} color="black" />
-                ),
-              }}
-              name="Menu"
-              component={MenuStack}
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="SearchBar"
+              component={SearchBar}
             />
-            <BottomTabs.Screen
-              options={{
-                tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="bookmark" size={20} color={color} />
-                ),
-              }}
-              name="Bookmark"
-              component={BookmarkStack}
+            <Stack.Screen 
+              options={{headerShown: false}}
+              name="AddNews"
+              component={AddNews} 
             />
-            <BottomTabs.Screen
-              options={{
-                tabBarIcon: ({size, color, focused}) => (
-                  <Icon name="user" size={20} color={color} />
-                ),
-              }}
-              name="Profile"
-              component={ProfileStack}
+              <Stack.Screen 
+              options={{headerShown: false}}
+              name="EditNews"
+              component={EditNews} 
             />
-          </BottomTabs.Navigator>
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="Trending"
+              component={Trending}
+            />
+          </Stack.Navigator>
         ) : (
           <Stack.Navigator>
             {/* <Stack.Screen

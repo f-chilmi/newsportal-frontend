@@ -24,6 +24,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
+        isError: false,
         alertMsg: 'success add bookmark',
       }
     }
@@ -45,7 +46,27 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         alertMsg: 'success get bookmark',
-        data: action.payload.data
+        data: action.payload.data.result
+      }
+    }
+    case 'DELETE_BOOKMARK_PENDING': {
+      return {
+        ...state,
+        isLoading: true
+      }
+    }
+    case 'DELETE_BOOKMARK_REJECTED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      }
+    }
+    case 'DELETE_BOOKMARK_FULFILLED': {
+      return {
+        ...state,
+        isLoading: false,
+        alertMsg: 'success delete bookmark',
       }
     }
     default: {

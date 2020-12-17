@@ -9,5 +9,9 @@ export default {
   get: (token) => ({
     type: 'GET_BOOKMARK',
     payload: http(token).get('/bookmarks')
+  }),
+  delete: (token, id) => ({
+    type: 'DELETE_BOOKMARK',
+    payload: http(token).delete(`/bookmarks/${id}`)
   })
 };

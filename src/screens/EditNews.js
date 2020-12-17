@@ -68,7 +68,7 @@ class EditNews extends Component {
     })
   }
   goToMyArticle = () => {
-    this.props.navigation.navigate('MyArticle')
+    this.props.navigation.navigate('Tabbed')
   }
   render() {
     // console.log(this.state)
