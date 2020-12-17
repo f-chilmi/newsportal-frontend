@@ -32,6 +32,7 @@ export default (state = initialState, action) => {
         isLogin: true,
         data: action.payload.data.result,
         configHome: action.payload.config.url,
+        info: action.payload.data.pagination1,
         alertMsg: 'success get news',
       }
     }

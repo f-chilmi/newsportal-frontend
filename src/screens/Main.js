@@ -12,7 +12,7 @@ const BottomTabs = createBottomTabNavigator();
 
 import HeaderComponent from '../components/HeaderComponent'
 import SearchBar from './SearchBar'
-import Home from './Home'
+import Home from './Home1'
 import Detail from './Detail'
 import Trending from './Trending'
 import Menu from './Menu'

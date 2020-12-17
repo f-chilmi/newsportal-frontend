@@ -55,11 +55,9 @@ const list = [
   },
 ]
 
-import logo from '../assets/logokompas.png'
-
 export default class Menu extends Component {
   goToTrending = () => {
-    this.props.navigation.navigate('Trending');
+    this.props.navigation.navigate('Home');
   }
   render() {
     return (
