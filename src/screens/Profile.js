@@ -51,8 +51,11 @@ class Profile extends Component {
       }
     })
   }
-  changePassword = () => {
+  openChangePassword = () => {
     this.setState({modalPassword: true})
+  }
+  changePassword = () => {
+    this.setState({modalPassword: false})
     const data = {
       oldPassword: this.state.oldPassword,
       newPassword: this.state.newPassword,
@@ -113,7 +116,7 @@ class Profile extends Component {
           <View style={style.parent}>
             <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
             {this.state.picture === '' ? (
-              (this.props.profile.data.image == null ? (
+              (this.props.profile.data.image === '' ? (
                 <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
               ) : (
                 <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
@@ -142,7 +145,7 @@ class Profile extends Component {
                 <Text style={style.labelName}>{birth}</Text>
               </View>
             </View>
-            <TouchableOpacity style={style.setting} onPress={this.changePassword}>
+            <TouchableOpacity style={style.setting} onPress={this.openChangePassword}>
               <Text style={style.textSetting} >Setting</Text>
             </TouchableOpacity>
             <TouchableOpacity style={style.setting} onPress={this.logout}>
@@ -233,14 +236,14 @@ class Profile extends Component {
                     type="outline"
                     buttonStyle={style.buttonOutline}
                     titleStyle={style.buttonTittle}
-                    onPress={this.changePassword}
+                    onPress={()=>this.setState({modalPassword: false})}
                   />
                   <Button
                     title="Save"
                     type="outline"
                     buttonStyle={style.buttonOutline}
                     titleStyle={style.buttonTittle}
-                    onPress={()=>this.setState({modalPassword: false})}
+                    onPress={this.changePassword}
                   />
                 </View>
               </KeyboardAvoidingView>

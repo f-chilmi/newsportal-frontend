@@ -10,6 +10,7 @@ import moment from 'moment'
 import SplashScreen from 'react-native-splash-screen'
 
 import newsAction from '../redux/actions/news';
+import bookmark from '../redux/actions/bookmark';
 
 class Home extends Component {
   state = {
@@ -44,6 +45,13 @@ class Home extends Component {
       this.setState({refreshing: false})
     }, 500);
   };
+  addBookmark = (id, category) => {
+    const data = {
+      category_id: category,
+      news_id: id,
+    }
+    this.props.add(this.props.auth.token, data)
+  }
   render() {
     const {data} = this.props.news
     const today = moment(new Date()).format('DD/MM/YY')
@@ -82,13 +90,14 @@ class Home extends Component {
                       </TouchableOpacity>
                     </View>
                     <View style={style.downWrap}>
-                      {/* <Text style={style.timeText}>{item.updatedAt}</Text> */}
                       {today===moment(item.createdAt).format('DD/MM/YY') ? (
                         <Text style={style.timeText}> {moment(item.createdAt).format('HH:mm')}</Text>
                       ):(
                       <Text style={style.timeText}>{moment(item.createdAt).format('DD/MM/YY')}</Text>
                       )}
-                      <TouchableOpacity><Icon name="bookmark" size={22} /></TouchableOpacity>
+                      <TouchableOpacity onPress={()=>this.addBookmark(item.id, item.category_id)}>
+                        <Icon name="bookmark" size={22} />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -107,10 +116,12 @@ class Home extends Component {
 const mapStateToProps = (state) => ({
   auth: state.auth,
   news: state.news,
+  bookmark: state.bookmark,
 });
 
 const mapDispatchToProps = {
   getNews: newsAction.getNews,
+  add: bookmark.add,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

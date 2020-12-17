@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { Header } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import logo from '../assets/logokompas.png'
 import HeaderComponent from '../components/HeaderComponent'
 
 export default class Trending extends Component {
