@@ -10,7 +10,8 @@ export default (state = initialState, action) => {
     case 'ADD_BOOKMARK_PENDING': {
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        alertMsg: 'add loading',
       }
     }
     case 'ADD_BOOKMARK_REJECTED': {
@@ -18,7 +19,6 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
-        alertMsg: 'add loading',
       }
     }
     case 'ADD_BOOKMARK_FULFILLED': {

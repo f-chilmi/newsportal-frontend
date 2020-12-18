@@ -26,7 +26,6 @@ export default (state = initialState, action) => {
       }
     }
     case 'GET_NEWS_FULFILLED': {
-      const newData = state.data.concat(action.payload.data.result.rows)
       return {
         ...state,
         isLoading: false,
