@@ -13,5 +13,8 @@ export default {
   delete: (token, id) => ({
     type: 'DELETE_BOOKMARK',
     payload: http(token).delete(`/bookmarks/${id}`)
-  })
+  }),
+  logout: () => ({
+    type: 'LOGOUT',
+  }),
 };

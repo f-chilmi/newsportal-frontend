@@ -10,7 +10,7 @@ export default class HeaderComponent extends Component {
     this.props.navigation.navigate('Login');
   };
   search = () => {
-    this.props.navigation.navigate('SearchBar')
+    // this.props.navigation.navigate('SearchBar')
   }
   render() {
     console.log(this.props)

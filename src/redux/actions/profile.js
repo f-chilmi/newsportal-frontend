@@ -21,5 +21,8 @@ export default {
   changePassword: (token, data) => ({
     type: 'CHANGE_PASSWORD',
     payload: http(token).patch('/users/changepassword', qs.stringify(data))
-  })
+  }),
+  logout: () => ({
+    type: 'LOGOUT',
+  }),
 };

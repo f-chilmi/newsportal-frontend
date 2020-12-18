@@ -6,7 +6,8 @@ import {connect} from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import {APP_URL} from '@env'
 
-import auth from '../redux/actions/auth';
+import auth from '../redux/actions/auth'
+import bookmark from '../redux/actions/bookmark'
 import profile from '../redux/actions/profile'
 
 class Profile extends Component {
@@ -90,7 +91,11 @@ class Profile extends Component {
     this.getData()
   }
   logout = () => {
-    this.props.logout()
+    this.props.logoutProfile()
+    this.props.logoutBook()
+    setTimeout(() => {
+      this.props.logout()
+    }, 300);
   }
   render() {
     const { name, email, birth } = this.state
@@ -266,6 +271,8 @@ const mapDispatchToProps = {
   changeProfile: profile.changeProfile,
   changeProfile1: profile.changeProfile1,
   logout: auth.logout,
+  logoutBook: bookmark.logout,
+  logoutProfile: profile.logout,
   changePassword: profile.changePassword,
 };
 

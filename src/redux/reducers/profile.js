@@ -89,6 +89,16 @@ export default (state = initialState, action) => {
         isLoading: false,
       }
     }
+    case 'LOGOUT': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        errorMsg: '',
+        data: {},
+        myArticle: {}
+      }
+    }
     default: {
       return state
     }

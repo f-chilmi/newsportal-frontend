@@ -69,6 +69,15 @@ export default (state = initialState, action) => {
         alertMsg: 'success delete bookmark',
       }
     }
+    case 'LOGOUT': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        alertMsg: '',
+        data: {},
+      }
+    }
     default: {
       return state
     }
