@@ -2,9 +2,9 @@ import http from '../../helpers/http'
 import qs from 'querystring'
 
 export default {
-  getNews: () => ({
+  getNews: (url='/public') => ({
     type: 'GET_NEWS',
-    payload: http().get('/public'),
+    payload: http().get(`${url}`),
   }),
   search: (search='') => ({
     type: 'SEARCH_NEWS',

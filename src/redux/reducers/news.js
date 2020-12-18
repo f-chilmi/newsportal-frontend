@@ -26,11 +26,12 @@ export default (state = initialState, action) => {
       }
     }
     case 'GET_NEWS_FULFILLED': {
+      const newData = state.data.concat(action.payload.data.result.rows)
       return {
         ...state,
         isLoading: false,
         isLogin: true,
-        data: action.payload.data.result,
+        data: action.payload.data.result.rows,
         configHome: action.payload.config.url,
         info: action.payload.data.pagination1,
         alertMsg: 'success get news',
@@ -96,7 +97,7 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: true,
-        newsCategory: action.payload.data.result
+        data: action.payload.data.result.rows,
       }
     }
     case 'EDIT_NEWS_PENDING': {

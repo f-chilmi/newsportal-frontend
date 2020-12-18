@@ -21,9 +21,10 @@ class Detail extends Component {
           {Object.keys(detail).length>0 && (
             <View>
               <Image style={style.image} source={{uri: `${APP_URL}/${detail.image}`}} />
+              {console.log(`${APP_URL}/${detail.image}`)}
               <View style={style.contentWrapper}>
                 <Text style={style.title}>{detail.title}</Text>
-                <Text style={style.author}>{detail.User.name}</Text>
+                <Text style={style.author}>{detail.User === null ? 'New user' : detail.User.name}</Text>
                 <Text style={style.writtenDate}>{moment(detail.updatedAt).format('DD/MM/YY hh:mm')}</Text>
                 <Text style={style.content}>{detail.description}</Text>
               </View>

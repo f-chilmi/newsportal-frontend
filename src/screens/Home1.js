@@ -13,7 +13,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import newsAction from '../redux/actions/news';
 import bookmarkAct from '../redux/actions/bookmark';
 
-const Home1 = ({navigation}) => {
+const Home1 = ({navigation, route}) => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const news = useSelector((state) => state.news);
@@ -22,10 +22,11 @@ const Home1 = ({navigation}) => {
 
   useEffect(() => {
     SplashScreen.hide();
-    if(!(news.configHome=='/public?search=')){
-      dispatch(newsAction.getNews());
+    dispatch(newsAction.getNews());
+    if (route.params !== undefined) {
+      console.log('params !== undefined')
+      dispatch(newsAction.newsByCategory(route.params.index))
     }
-
   }, []);
 
   const goToDetail = (id) => {
@@ -46,18 +47,27 @@ const Home1 = ({navigation}) => {
       news_id: id,
     }
     dispatch(bookmarkAct.add(auth.token, data));
+    setTimeout(() => {
+      dispatch(bookmarkAct.get(auth.token));
+    }, 500);
   }
 
   const nextPage = () => {
-    // if (news.info.nextLink) {
-    //   dispatch(homeAction.nextAndPrevLinkCatalog(home.info.nextLink));
-    // }
+    if (news.info.nextLink) {
+      dispatch(newsAction.getNews(news.info.nextLink));
+    }
+  };
+
+  const prevPage = () => {
+    if (news.info.prevLink) {
+      dispatch(newsAction.getNews(news.info.prevLink));
+    }
   };
 
   const { data } = news
 
   const today = moment(new Date()).format('DD/MM/YY')
-
+  
   const render = ({item}) => (
     <View style={style.card} key={item.id.toString().concat(item.title)}>
       <Image style={style.cardImage} source={{uri: `${APP_URL}/${item.image}`}} />
@@ -93,7 +103,17 @@ const Home1 = ({navigation}) => {
           </TouchableOpacity>
         }
       />
-      {bookmark.isLoading && (
+      {bookmark.isLoading && bookmark.alertMsg === 'add loading' && (
+        <Modal transparent visible>
+          <View style={style.modalViewLoading}>
+            <View style={style.alertBox}>
+              <ActivityIndicator size="large" color="black" />
+              <Text style={style.textAlert}>Loading . . .</Text>
+            </View>
+          </View>
+        </Modal>
+      )}
+      {news.isLoading && (
         <Modal transparent visible>
           <View style={style.modalViewLoading}>
             <View style={style.alertBox}>
@@ -106,15 +126,23 @@ const Home1 = ({navigation}) => {
       {Object.keys(data).length==0 && <Spinner />}
       {Object.keys(data).length>0 && (
         <FlatList
-          data={data.rows}
+          data={data}
           renderItem={render}
           keyExtractor={(item) => item.id}
           refreshing={refreshing}
           onRefresh={getData}
-          onEndReached={nextPage}
-          onEndReachedThreshold={0.5}
+          // onEndReached={nextPage}
+          // onEndReachedThreshold={0.5}
         />
       )}
+      <View style={style.nextWrapper}>
+        <TouchableOpacity style={style.editButton} onPress={prevPage}>
+          <Text style={style.editText}>Prev</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={style.editButton} onPress={nextPage}>
+          <Text style={style.editText}>Next</Text>
+        </TouchableOpacity>
+      </View>
 
       </View>
   )
@@ -207,5 +235,26 @@ const style = StyleSheet.create({
     color: 'black',
     marginTop: 20,
     textAlign: 'center',
+  },
+  editButton: {
+    width: '25%',
+    height: 20,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignContent: 'center',
+    marginRight: 10
+  },
+  editText: {
+    fontSize: 10
+  },
+  nextWrapper: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10
   },
 })

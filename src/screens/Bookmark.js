@@ -106,7 +106,6 @@ const style = StyleSheet.create({
   card: {
     height: 120,
     width: '100%',
-    // backgroundColor: 'yellow',
     padding: 10,
     flexDirection: 'row',
     borderTopWidth: 0.5,

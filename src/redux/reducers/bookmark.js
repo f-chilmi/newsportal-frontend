@@ -18,6 +18,7 @@ export default (state = initialState, action) => {
         ...state,
         isLoading: false,
         isError: true,
+        alertMsg: 'add loading',
       }
     }
     case 'ADD_BOOKMARK_FULFILLED': {

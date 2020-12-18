@@ -4,9 +4,11 @@ import { SearchBar as SearchComponent } from 'react-native-elements'
 import { Spinner } from 'native-base'
 import {APP_URL} from '@env'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import moment from 'moment'
 
 import {connect} from 'react-redux'
 import news from '../redux/actions/news'
+import bookmarkAct from '../redux/actions/bookmark'
 
 class SearchBar extends Component {
   state = {
@@ -18,8 +20,18 @@ class SearchBar extends Component {
   goToDetail = (id) => {
     this.props.navigation.navigate('Detail', {id});
   }
+  addBookmark = (id, category) => {
+    const data = {
+      category_id: category,
+      news_id: id,
+    }
+    this.props.add(this.props.auth.token, data)
+    setTimeout(() => {
+      this.props.get(this.props.auth.token)
+    }, 500);
+  }
   render() {
-    console.log(this.state.search)
+    const today = moment(new Date()).format('DD/MM/YY')
     const data = this.props.news.search
     return (
       <View style={{flex: 1, paddingTop: 20}}>
@@ -30,7 +42,7 @@ class SearchBar extends Component {
           value={this.state.search}
           onSubmitEditing={this.updateSearch}
         />
-        {this.props.news.isLoading && (
+        {this.props.news.isLoading || this.props.bookmark.isLoading && (
           <Modal transparent visible>
             <View style={style.modalView}>
               <View style={style.alertBox}>
@@ -51,13 +63,19 @@ class SearchBar extends Component {
                   <View style={style.rightSide}>
                     <View style={style.upWrap}>
                       <Text style={style.category}>{item.Category.category}</Text>
-                      <TouchableOpacity style={style.titleWrap} onPress={this.search}>
+                      <TouchableOpacity style={style.titleWrap} onPress={()=>this.goToDetail(item.id)}>
                         <Text style={style.titleNews}>{item.title}</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={style.downWrap}>
-                      <Text style={style.timeText}>{item.updatedAt}</Text>
-                      <TouchableOpacity><Icon name="bookmark" size={22} /></TouchableOpacity>
+                      {today===moment(item.createdAt).format('DD/MM/YY') ? (
+                        <Text style={style.timeText}> {moment(item.createdAt).format('HH:mm')}</Text>
+                      ):(
+                      <Text style={style.timeText}>{moment(item.createdAt).format('DD/MM/YY')}</Text>
+                      )}
+                      <TouchableOpacity onPress={()=>this.addBookmark(item.id, item.category_id)}>
+                        <Icon name="bookmark" size={22} />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -72,10 +90,16 @@ class SearchBar extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({news: state.news});
+const mapStateToProps = (state) => ({
+  news: state.news,
+  bookmark: state.bookmark,
+  auth: state.auth,
+});
 
 const mapDispatchToProps = {
   search: news.search,
+  get: bookmarkAct.get,
+  add: bookmarkAct.add,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

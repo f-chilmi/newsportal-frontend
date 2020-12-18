@@ -99,7 +99,7 @@ class Profile extends Component {
   }
   render() {
     const { name, email, birth } = this.state
-    console.log(this.state)
+    
     return (
       <View >
         <Header
@@ -121,7 +121,7 @@ class Profile extends Component {
           <View style={style.parent}>
             <TouchableOpacity style={style.avaWrapper} onPress={this.changeImage}>
             {this.state.picture === '' ? (
-              (this.props.profile.data.image === '' ? (
+              (this.props.profile.data.image === '' || this.props.profile.data.image == null ? (
                 <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
               ) : (
                 <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
@@ -161,7 +161,7 @@ class Profile extends Component {
               <View style={style.modalView1}>
                 <View style={style.avaWrapper}>
                   {this.state.picture == '' ? (
-                    (this.props.profile.data.image == '' ? (
+                    (this.props.profile.data.image == '' || this.props.profile.data.image == null ? (
                       <Image style={style.ava} source={require('../assets/5fa3e598894a4.jpg')}/>
                     ) : (
                       <Image style={style.ava} source={{uri: `${APP_URL}/${this.props.profile.data.image}`}}/>
@@ -188,11 +188,26 @@ class Profile extends Component {
               <KeyboardAvoidingView style={style.modalView}>
                 <Form style={style.form}>
                   <Label style={style.label}>Full name</Label>
-                  <TextInput style={style.input} value={name} onChangeText={(text) => this.setState({name: text})} />
+                  <TextInput 
+                    style={style.input} 
+                    value={name} 
+                    onChangeText={(text) => this.setState({name: text})} 
+                    placeholder="Input your fullname"
+                  />
                   <Label style={style.label}>Email</Label>
-                  <TextInput style={style.input} value={email} onChangeText={(text) => this.setState({email: text})} />
+                  <TextInput 
+                    style={style.input}
+                    value={email}
+                    onChangeText={(text) => this.setState({email: text})} 
+                    placeholder="Input your email"
+                  />
                   <Label style={style.label}>Date of birth</Label>
-                  <TextInput style={style.input} value={birth} onChangeText={(text) => this.setState({birth: text})} />
+                  <TextInput 
+                    style={style.input}
+                    value={birth} 
+                    onChangeText={(text) => this.setState({birth: text})}
+                    placeholder="Date format dd-mm-yyyy"
+                  />
                 </Form>
                 <View style={style.buttonWrapper}>
                   <Button

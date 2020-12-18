@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import { Header, ListItem } from 'react-native-elements'
+import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import HeaderComponent from '../components/HeaderComponent'
+
+import newsAction from '../redux/actions/news';
 
 const list = [
   {
@@ -55,17 +58,19 @@ const list = [
   },
 ]
 
-export default class Menu extends Component {
-  goToTrending = () => {
-    this.props.navigation.navigate('Home');
+class Menu extends Component {
+  goToTrending = (i) => {
+    const index = i + 1
+    // this.props.newsByCategory(index)
+    this.props.navigation.navigate('Home', {index});
   }
   render() {
     return (
       <ScrollView>
         <HeaderComponent/>
         {
-          list.map((item, i) => (
-            <ListItem key={i} bottomDivider onPress={this.goToTrending}>
+          list.map((item, index) => (
+            <ListItem key={index} bottomDivider onPress={() => this.goToTrending(index)}>
               <Icon name={item.icon} size={20} />
               <ListItem.Content>
                 <ListItem.Subtitle size={15} style={style.title}>{item.title}</ListItem.Subtitle>
@@ -78,6 +83,17 @@ export default class Menu extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  news: state.news,
+});
+
+const mapDispatchToProps = {
+  getNews: newsAction.getNews,
+  newsByCategory: newsAction.newsByCategory,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menu);
 
 const style = StyleSheet.create({
   imageWrapper: {
