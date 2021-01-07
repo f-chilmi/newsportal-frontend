@@ -35,7 +35,7 @@ const Bookmark = ({navigation}) => {
       <Image style={style.cardImage} source={{uri: `${APP_URL}/${item.News.image}`}} />
       <View style={style.rightSide}>
         <View style={style.upWrap}>
-          <Text style={style.category}>{item.Category.category}</Text>
+          {/* <Text style={style.category}>{item.Category.category}</Text> */}
           <TouchableOpacity style={style.titleWrap} onPress={()=>goToDetail(item.News.id)}>
             <Text style={style.titleNews}>{item.News.title}</Text>
           </TouchableOpacity>

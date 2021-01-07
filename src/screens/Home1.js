@@ -73,7 +73,8 @@ const Home1 = ({navigation, route}) => {
       <Image style={style.cardImage} source={{uri: `${APP_URL}/${item.image}`}} />
       <View style={style.rightSide}>
         <View style={style.upWrap}>
-          <Text style={style.category}>{item.Category.category}</Text>
+          {console.log(item)}
+          {/* <Text style={style.category}>{item.Category.category}</Text> */}
           <TouchableOpacity style={style.titleWrap} onPress={()=>goToDetail(item.id)}>
             <Text style={style.titleNews}>{item.title}</Text>
           </TouchableOpacity>

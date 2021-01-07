@@ -27,7 +27,7 @@ class EditNews extends Component {
       if(this.state.id=='' || this.state.id!==this.props.route.params.id){
         this.setState({
           title: detail.title,
-          categoryId: String(detail.Category.id),
+          // categoryId: String(detail.Category.id),
           picture: detail.image,
           description: detail.description,
           id: this.props.route.params.id
